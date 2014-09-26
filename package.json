@@ -4,9 +4,9 @@
   "description": "",
   "main": "pocket.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "gulp test"
   },
-  "author": "",
+  "author": "Gilad Gray <giladgray@gmail.com>",
   "license": "MIT",
   "devDependencies": {
     "browser-sync": "^1.5.1",

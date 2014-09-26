@@ -1,3 +1,11 @@
+###
+Many thanks to kirbysayshi for inspiration and code samples.
+@see https://github.com/kirbysayshi/pocket-ces
+
+@author Gilad Gray
+@license MIT
+###
+
 _ = require 'lodash'
 
 class Pocket
