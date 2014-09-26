@@ -53,12 +53,11 @@ class Pocket
    * @param {Function, Object} initializer component initializer function
    *   `(component, options) -> void` or default options object
   ###
-  componentType: (name, initializer) ->
+  component: (name, initializer) ->
     if _.isFunction initializer
       # noop
     else if _.isObject initializer
       compFn = (defaults, comp, options={}) ->
-        console.log arguments
         _.defaults comp, _.clone(defaults, true)
         _.assign comp, options
         # _.defaults comp, _.clone(defaults, true)

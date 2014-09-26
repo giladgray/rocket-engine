@@ -1,7 +1,7 @@
 {
   "name": "pocket",
   "version": "0.0.0",
-  "description": "",
+  "description": "a little game engine that fits in your pocket",
   "main": "pocket.js",
   "scripts": {
     "test": "gulp test"
