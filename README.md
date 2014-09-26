@@ -62,3 +62,11 @@ pocket.system 'inital-badguy-generation', (pocket) ->
 # - input components: keyboard and mouse
 # - graphics systems: Context2D data and rendering components
 ```
+
+## Thanks
+My deepest thanks go to @kirbysayshi for his presentation
+[Developing Games Using Data not Trees](http://2014.jsconf.eu/speakers/#/speakers/drew-petersen-developing-games-using-data-not-trees) at JSConf EU 2014,
+and for his code at kirbysayshi/pocket-ces.
+
+## License
+MIT
