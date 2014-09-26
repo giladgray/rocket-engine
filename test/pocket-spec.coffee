@@ -59,3 +59,10 @@ describe 'Pocket', ->
       pocket.component('position', posObj)
       expect(pocket.componentTypes.position({})).to.deep.equal posObj
       expect(pocket.componentTypes.position({position: [1, 2]})).to.deep.equal {position: [1, 2]}
+
+  describe '#getData', ->
+    it 'should return data associated with first key for component name', ->
+      config = {foo: 'bar', baz: 'qux'}
+      pocket.component 'config', config
+      pocket.key {config: null}
+      expect(pocket.getData 'config').to.deep.equal config

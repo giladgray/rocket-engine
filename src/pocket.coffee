@@ -1,9 +1,9 @@
 ###
-Many thanks to kirbysayshi for inspiration and code samples.
-@see https://github.com/kirbysayshi/pocket-ces
-
 @author Gilad Gray
 @license MIT
+
+Many thanks to kirbysayshi for inspiration and code samples.
+@see https://github.com/kirbysayshi/pocket-ces
 ###
 
 _ = require 'lodash'
@@ -91,5 +91,13 @@ class Pocket
         @labels[componentName] = true
         console.log "Found no component definition for '#{componentName}', assuming it's a label."
     return
+
+  ###*
+   * Returns the contents of the first key associated with the component name.
+   * @param {String} name name of component to query for data
+  ###
+  getData: (name) ->
+    data = @components[name]
+    return data[_.keys(data)[0]]
 
 module.exports = Pocket
