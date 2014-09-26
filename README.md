@@ -66,7 +66,7 @@ pocket.system 'inital-badguy-generation', (pocket) ->
 ## Thanks
 My deepest thanks go to @kirbysayshi for his presentation
 [Developing Games Using Data not Trees](http://2014.jsconf.eu/speakers/#/speakers/drew-petersen-developing-games-using-data-not-trees) at JSConf EU 2014,
-and for his code at kirbysayshi/pocket-ces.
+and for his code at [kirbysayshi/pocket-ces](/kirbysayshi/pocket-ces).
 
 ## License
 MIT
