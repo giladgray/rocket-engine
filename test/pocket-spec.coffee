@@ -5,7 +5,8 @@ Pocket = require '../src/pocket.coffee'
 
 describe 'Pocket', ->
   pocket = null
-  posFn = (comp, options) -> comp.position = options.position
+  posFn  = (comp, options) -> comp.position = options.position
+  posObj = {position: [0, 0]}
 
   beforeEach -> pocket = new Pocket()
 
@@ -34,13 +35,11 @@ describe 'Pocket', ->
       expect(posComp[key]).to.deep.equal position
 
     it 'should use default values for defined components', ->
-      posObj = {position: [0, 0]}
       pocket.component 'position', posObj
       key = pocket.key {position: null}
       expect(pocket.getComponent('position')[key]).to.deep.equal posObj
 
     it 'should use provided values for defined components', ->
-      posObj = {position: [0, 0]}
       pocket.component 'position', posObj
       position = {position: [2, -1]}
       key = pocket.key {position}
@@ -53,12 +52,10 @@ describe 'Pocket', ->
       expect(pocket._componentTypes.position).to.equal posFn
 
     it 'should convert an object to a function', ->
-      posObj = {position: [0, 0]}
       pocket.component('position', posObj)
       expect(pocket._componentTypes.position).to.be.a.function
 
     it 'converted function should assign object defaults', ->
-      posObj = {position: [0, 0]}
       pocket.component('position', posObj)
       expect(pocket._componentTypes.position({})).to.deep.equal posObj
       expect(pocket._componentTypes.position({position: [1, 2]})).to.deep.equal {position: [1, 2]}
@@ -69,3 +66,26 @@ describe 'Pocket', ->
       pocket.component 'config', config
       pocket.key {config: null}
       expect(pocket.getData 'config').to.deep.equal config
+
+  describe '#filterKeys', ->
+    beforeEach ->
+      pocket.component 'position', {x: 0, y: 0}
+      pocket.component 'velocity', {x: 0, y: 0}
+      pocket.component 'mass', {mass: 10}
+      pocket.component 'density', {density: 1.0}
+      pocket.component 'amoeba', {}
+
+      pocket.key {position: null, velocity: null, mass: null, density: null}
+      pocket.key {position: null, velocity: null, mass: null}
+      pocket.key {position: null, velocity: null, density: null}
+      pocket.key {position: null, velocity: null}
+      pocket.key {position: null, mass: null}
+      pocket.key {position: null, density: null}
+
+    it 'should return all keys that contain all listed properties', ->
+      expect(pocket.filterKeys ['position', 'velocity', 'density']).to.have.length 2
+      expect(pocket.filterKeys ['position', 'mass']).to.have.length 3
+      expect(pocket.filterKeys ['density']).to.have.length 3
+
+    it 'should return empty array if no keys match', ->
+      expect(pocket.filterKeys ['amoeba']).to.be.empty
