@@ -37,6 +37,20 @@ class Pocket
 
     return id
 
+  ###*
+   * Convenience method to add a series of keys at once.
+   * @see Pocket::key
+   * @param  {Array<Object>} keys an array or splat of key definitions
+   * @return {Array<String>}      IDs of new keys
+  ###
+  keys: (keys...) ->
+    @key(cmps) for cmps in _.flatten(keys)
+
+  ##*
+  # Returns an array of all keys currently in the pocket.
+  # @return {Array<String>} all the keys in the pocket
+  getKeys: -> _.keys @_keys
+
   destroyKey = (id) ->
     @_keysToDestroy[id] = true
 
@@ -66,6 +80,15 @@ class Pocket
       throw new Error 'Unexpected component initializer type. Must be function or object.'
     @_componentTypes[name] = initializer
     @_components[name] = {}
+    return
+
+  ###*
+   * Convenience function to define several components at once.
+   * @see Pocket::component
+   * @param  {Object} components mapping of names to initializers
+  ###
+  components: (components) ->
+    @component(name, initializer) for name, initializer of components
     return
 
   ###*

@@ -17,6 +17,10 @@ describe 'Pocket', ->
     it 'should require an object', ->
       expect(pocket.key).to.throw
 
+    it 'should create a new key ID', ->
+      pocket.key({})
+      expect(pocket.getKeys()).to.have.length 1
+
     it 'should auto-assign string ID', ->
       expect(pocket.key({})).to.be.a.string
 
@@ -45,6 +49,12 @@ describe 'Pocket', ->
       key = pocket.key {position}
       expect(pocket.getComponent('position')[key]).to.deep.equal position
 
+  describe '#keys', ->
+    it 'should create multiple keys', ->
+      pocket.component 'position', {x: 0, y: 0}
+      expect(pocket.keys [{position: null}, {position: null}, {ship: null}]).to.have.length 3
+      expect(pocket.getKeys()).to.have.length 3
+
   describe '#component', ->
     it 'should accept a function', ->
       pocket.component('position', posFn)
@@ -60,6 +70,14 @@ describe 'Pocket', ->
       expect(pocket._componentTypes.position({})).to.deep.equal posObj
       expect(pocket._componentTypes.position({position: [1, 2]})).to.deep.equal {position: [1, 2]}
 
+  describe '#components', ->
+    it 'should create multiple components', ->
+      pocket.components
+        position: {x: 0, y: 0}
+        velocity: {x: 0, y: 0}
+      expect(pocket.getComponent('position')).to.exist
+      expect(pocket.getComponent('velocity')).to.exist
+
   describe '#getData', ->
     it 'should return data associated with first key for component name', ->
       config = {foo: 'bar', baz: 'qux'}
@@ -69,18 +87,21 @@ describe 'Pocket', ->
 
   describe '#filterKeys', ->
     beforeEach ->
-      pocket.component 'position', {x: 0, y: 0}
-      pocket.component 'velocity', {x: 0, y: 0}
-      pocket.component 'mass', {mass: 10}
-      pocket.component 'density', {density: 1.0}
-      pocket.component 'amoeba', {}
+      pocket.components
+        position : {x: 0, y: 0}
+        velocity : {x: 0, y: 0}
+        mass     : {mass: 10}
+        density  : {density: 1.0}
+        amoeba   : {}
 
-      pocket.key {position: null, velocity: null, mass: null, density: null}
-      pocket.key {position: null, velocity: null, mass: null}
-      pocket.key {position: null, velocity: null, density: null}
-      pocket.key {position: null, velocity: null}
-      pocket.key {position: null, mass: null}
-      pocket.key {position: null, density: null}
+      pocket.keys [
+        {position: null, velocity: null, mass: null, density: null}
+        {position: null, velocity: null, mass: null}
+        {position: null, velocity: null, density: null}
+        {position: null, velocity: null}
+        {position: null, density: null}
+        {position: null, mass: null}
+      ]
 
     it 'should return all keys that contain all listed properties', ->
       expect(pocket.filterKeys ['position', 'velocity', 'density']).to.have.length 2
