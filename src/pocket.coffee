@@ -10,14 +10,14 @@ _ = require 'lodash'
 
 class Pocket
   constructor: ->
-    @componentTypes = {}
+    @_componentTypes = {}
 
-    @keys = {}
-    @labels = {}
-    @systems = {}
-    @components = {}
+    @_keys = {}
+    @_labels = {}
+    @_systems = {}
+    @_components = {}
 
-    @keysToDestroy = {}
+    @_keysToDestroy = {}
 
   ###*
    * Store a new key in the Pocket
@@ -26,11 +26,11 @@ class Pocket
   ###
   key: (components) ->
     id = components.id ? _.uniqueId('key-')
-    if components.id && @keys[components.id]
+    if components.id && @_keys[components.id]
       console.warn "discarding component id #{components.id}"
       id = _.uniqueId('key-')
 
-    @keys[id] = id
+    @_keys[id] = id
 
     for name, component of components
       @addComponentToKey id, name, component
@@ -38,14 +38,14 @@ class Pocket
     return id
 
   destroyKey = (id) ->
-    @keysToDestroy[id] = true
+    @_keysToDestroy[id] = true
 
   immediatelyDestroyKey: (id) ->
-    unless @keys[id]
+    unless @_keys[id]
       throw new Error("key with id #{id} already destroyed")
-    delete @keys[id]
-    for name, cmp of @components
-      delete @components[name][id]
+    delete @_keys[id]
+    for name, cmp of @_components
+      delete @_components[name][id]
 
   ###*
    * Register a new named component type in the Pocket.
@@ -64,8 +64,16 @@ class Pocket
       initializer = _.partial compFn, initializer
     unless _.isFunction initializer
       throw new Error 'Unexpected component initializer type. Must be function or object.'
-    @componentTypes[name] = initializer
+    @_componentTypes[name] = initializer
+    @_components[name] = {}
     return
+
+  ###*
+   * Returns the state of the given component, for testing only.
+   * @param {String} name component name
+   * @return {Object} component state: mapping of keys to their component values
+  ###
+  getComponent: (name) -> @_components[name]
 
   ###*
    * Adds a new instance to the given component under the given ID with options
@@ -74,21 +82,21 @@ class Pocket
    * @param {Object} options       options for component initializer
   ###
   addComponentToKey: (id, componentName, options) ->
-    key = @keys[id]
+    key = @_keys[id]
     unless key
       throw new Error "could not find key with id #{id}"
 
-    others = @components[componentName] ?= {}
+    others = @_components[componentName] ?= {}
     comp = others[id]
 
     unless comp
       comp = others[id] = {}
-      componentDef = @componentTypes[componentName]
+      componentDef = @_componentTypes[componentName]
 
       if componentDef
         componentDef(comp, options)
-      else if !@labels[componentName]
-        @labels[componentName] = true
+      else if !@_labels[componentName]
+        @_labels[componentName] = true
         console.log "Found no component definition for '#{componentName}', assuming it's a label."
     return
 
@@ -97,7 +105,7 @@ class Pocket
    * @param {String} name name of component to query for data
   ###
   getData: (name) ->
-    data = @components[name]
+    data = @_components[name]
     return data[_.keys(data)[0]]
 
 module.exports = Pocket
