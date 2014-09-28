@@ -59,8 +59,9 @@ class Pocket
   ###
   getKeys: -> _.keys @_keys
 
-  destroyKey: (id) ->
-    @_keysToDestroy[id] = true
+  destroyKey: (id) -> @_keysToDestroy[id] = true
+
+  destroyKeys: (ids...) -> @destroyKey(id) for id in _.flatten ids
 
   ###*
    * Deletes key entry and all component data about it.
