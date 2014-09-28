@@ -13,10 +13,10 @@ Pocket = require 'pocket'
 
 pocket = new Pocket
 
-# 1. define components as functions...
+# 1. define components as functions that assign values...
 pocket.component 'position', (cmp, options) ->
   cmp = {x: options.x ? 0, y: options.y ? 0}
-# ...or as default values
+# ...or as default value objects
 pocket.component 'velocity', {x: 0, y: 0}
 
 # 2. define systems that operate on keys with specific components

@@ -1,5 +1,3 @@
-console.log 'hello from coffee!'
-
 pocket = new Pocket
 
 # context-2d component for storing CanvasRenderingContext2D and other canvas info
@@ -9,7 +7,7 @@ pocket.component 'context-2d', (cmp, options) ->
   cmp.center = {x: 0, y: 0}
 
   # ensure canvas is as large as possible
-  window.addEventListener "resize", resize = ->
+  window.addEventListener 'resize', resize = ->
     cmp.canvas.width = document.body.clientWidth
     cmp.canvas.height = document.body.clientHeight
     cmp.width = cmp.canvas.width
