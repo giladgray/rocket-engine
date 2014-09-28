@@ -77,3 +77,8 @@ gulp.task 'watch', ->
 
   gulp.watch 'dist/**', (file) ->
     browserSync.reload(file.path) if file.type is "changed"
+
+gulp.task 'deploy', ->
+  deploy = require 'gulp-gh-pages'
+  gulp.src('./dist/**/*')
+      .pipe deploy()
