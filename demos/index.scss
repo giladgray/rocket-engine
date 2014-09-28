@@ -2,6 +2,12 @@ body {
   font-family: sans-serif;
   text-align: center;
   margin: 1em;
+
+  &.demo { margin: 0; }
+}
+
+canvas {
+  margin: auto;
 }
 
 pre {
@@ -38,8 +44,13 @@ a {
   right: 1em;
 }
 
-.view-source {
+.demo-header {
   position: absolute;
-  top: 1em;
-  right: 1em;
+  top: 0;
+  left: 0;
+  right: 0;
+  padding: 1em;
+
+  .title { float: left; }
+  .view-source { float: right; }
 }
