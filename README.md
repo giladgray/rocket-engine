@@ -45,10 +45,10 @@ pocket.key {
 pocket.component 'config', require './config'
 pocket.key 'config', {config: null}
 # and treated as data rather than a standard key
-config = pocket.getData 'config' # (aka firstData)
+config = pocket.getData 'config'
 
 # a system with no dependencies can be used to setup the game
-pocket.system 'inital-badguy-generation', (pocket) ->
+pocket.system 'inital-badguy-generation', [], (pocket) ->
   for i in [1..5]
     pocket.key
       badguy: true
@@ -72,7 +72,7 @@ pocket.systemForEach 'move', ['position', 'velocity'],
 ```
 
 ## Thanks
-My deepest thanks go to @kirbysayshi for his presentation
+My deepest thanks go to Drew Petersen (@kirbysayshi) for his presentation
 [Developing Games Using Data not Trees](http://2014.jsconf.eu/speakers/#/speakers/drew-petersen-developing-games-using-data-not-trees)
 at JSConf EU 2014, and for his code at [kirbysayshi/pocket-ces](https://github.com/kirbysayshi/pocket-ces).
 
