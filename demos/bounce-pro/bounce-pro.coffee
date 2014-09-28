@@ -4,11 +4,19 @@ random = (min, max) ->
     min = 0
   return Math.floor(Math.random() * (max - min)) + min
 
+# track number of balls on the screen
+numBalls = 0
+countElem = document.querySelector '.count'
+updateCount = (delta) ->
+  if delta then numBalls += delta
+  else numBalls = 0
+  countElem.textContent = numBalls
+
 pocket = new Pocket
 
 # context-2d component for storing CanvasRenderingContext2D and other canvas info
-pocket.component 'context-2d', (cmp, options) ->
-  cmp.canvas = document.querySelector options.canvas or '#canvas'
+pocket.component 'context-2d', (cmp, {canvas}) ->
+  cmp.canvas = document.querySelector canvas or '#canvas'
   cmp.g2d = cmp.canvas.getContext('2d')
   cmp.center = {x: 0, y: 0}
 
@@ -25,31 +33,79 @@ pocket.component 'context-2d', (cmp, options) ->
 # the context-2d data object
 pocket.key {'context-2d': null}
 
+# maintain keyboard state. this guy mutates himself, it's prety badass
+pocket.component 'keyboard-state', (cmp, {target, keymap}) ->
+  cmp.target = target or document
+  cmp.down = {}
+  # returns true if the named key was pressed in the last X milliseconds
+  cmp.isNewPress = (keyName, recency = 16) ->
+    downTime = cmp.down[keyName]
+    delta = Date.now() - downTime
+    return downTime and 0 < delta < recency
+
+  cmp.target.addEventListener 'keydown', (e) ->
+    keyName = keymap[e.which]
+    cmp.down[e.which] = true
+    if keyName and not cmp.down[keyName]
+      # record time it was pressed
+      cmp.down[keyName] = Date.now()
+
+  cmp.target.addEventListener 'keyup', (e) ->
+    keyName = keymap[e.which]
+    cmp.down[e.which] = false
+    if keyName
+      cmp.down[keyName] = 0
+
+# the keyboard-state data object
+pocket.key
+  'input': null
+  'keyboard-state':
+    keymap:
+      13: 'ADD'
+      32: 'DESTROY'
+
+# keyboard commands
+pocket.systemForEach 'input-balls', ['keyboard-state'], (pocket, key, keyboard) ->
+  if keyboard.isNewPress 'DESTROY'
+    pocket.destroyKeys pocket.filterKeys(['ball'])
+    updateCount(0)
+  if keyboard.isNewPress 'ADD'
+    randomBall()
+
 # ball components
 pocket.component 'position', {x: 0, y: 0}
 pocket.component 'velocity', {x: 0, y: 0}
 pocket.component 'circle',   {radius: 30, color: 'red'}
 
-# a bunch of balls!
+# cycle through colors
 colors = ['seagreen', 'navy', 'indigo', 'firebrick', 'goldenrod']
 curColor = 0
-nextColor = -> colors[curColor++]
+nextColor = ->
+  color = colors[curColor++]
+  curColor %= colors.length
+  return color
 
+# make a ball with random attributes
 randomBall = ->
+  updateCount(1)
   {width, height} = pocket.getData 'context-2d'
   radius = random(20, 100)
-  return {
+  pocket.key {
+    ball: true
     position :
       x: random(radius, width - radius)
       y: random(radius, height / 2 - radius)
-    velocity : {x: random(-5, 5), y: 0}
+    velocity : {x: random(-8, 8), y: 0}
     circle   : {radius, color: nextColor()}
   }
 
-@randomBall() for i in [0...5]
+# start with 5 of them
+randomBall() for i in [0...5]
+
+### NOW IT'S IDENTICAL TO BOUNCE! DEMO ###
 
 # apply gravity to every thing with a velocity
-GRAVITY = 1.0
+GRAVITY = 0.5
 pocket.systemForEach 'gravity', ['velocity'], (pocket, key, vel) ->
   vel.y += GRAVITY
 
