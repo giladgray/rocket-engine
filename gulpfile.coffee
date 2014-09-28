@@ -5,10 +5,10 @@ notify = require 'gulp-notify'
 browserSync = require 'browser-sync'
 
 sources =
-  sass  : 'demos/*/*.scss'
-  html  : 'demos/*/index.html'
+  sass  : 'demos/{,*}/*.scss'
+  html  : 'demos/{,*}/index.html'
   src   : 'src/*.coffee'
-  demos : 'demos/*/*.coffee'
+  demos : 'demos/{,*}/*.coffee'
   spec  : 'test/**/*.coffee'
 
 destinations =
