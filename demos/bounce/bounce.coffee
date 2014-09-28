@@ -19,6 +19,7 @@ pocket.component 'context-2d', (cmp, options) ->
 # the context-2d data object
 pocket.key {'context-2d': null}
 
+# ball components
 pocket.component 'position', {x: 0, y: 0}
 pocket.component 'velocity', {x: 0, y: 0}
 pocket.component 'circle',   {radius: 30, color: 'red'}
@@ -34,7 +35,7 @@ GRAVITY = 1.0
 pocket.systemForEach 'gravity', ['velocity'], (pocket, key, vel) ->
   vel.y += GRAVITY
 
-# move all balls
+# move each ball
 pocket.systemForEach 'move', ['position', 'velocity'], (pocket, key, pos, vel) ->
   pos.x += vel.x
   pos.y += vel.y
@@ -44,7 +45,7 @@ pocket.system 'clear-canvas', [], (pocket) ->
   {g2d, width, height} = pocket.getData 'context-2d'
   g2d.clearRect 0, 0, width, height
 
-# draw all the balls
+# draw each balls
 pocket.systemForEach 'draw-ball', ['position', 'circle'], (pocket, key, pos, circle) ->
   {g2d} = pocket.getData 'context-2d'
   g2d.beginPath()
@@ -53,7 +54,7 @@ pocket.systemForEach 'draw-ball', ['position', 'circle'], (pocket, key, pos, cir
   g2d.closePath()
   g2d.fill()
 
-# bounce balls when they reach the edge of the canvas
+# bounce each ball when they reach the edge of the canvas
 pocket.systemForEach 'bounce', ['position', 'velocity', 'circle'], (pkt, key, pos, vel, {radius}) ->
   {width, height} = pkt.getData 'context-2d'
   if pos.x < radius or pos.x > width - radius
@@ -64,7 +65,8 @@ pocket.systemForEach 'bounce', ['position', 'velocity', 'circle'], (pkt, key, po
     pos.y += vel.y
 
 # render loop
-start = ->
-  pocket.tick()
+start = (time) ->
+  pocket.tick(time)
   window.requestAnimationFrame start
-start()
+
+document.addEventListener 'DOMContentLoaded', -> start()
