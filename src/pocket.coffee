@@ -25,11 +25,12 @@ class Pocket
   ### KEYS ###
 
   ###*
-   * Store a new key in the Pocket
+   * Store a new key in the Pocket.
    * @param  {Object} components mapping of component or label names to initial values
    * @return {String}            ID of new key
   ###
   key: (components) ->
+    # generate a unique ID unless one is given
     id = components.id ? _.uniqueId('key-')
     if components.id && @_keys[components.id]
       console.warn "discarding component id #{components.id}"
@@ -37,6 +38,7 @@ class Pocket
 
     @_keys[id] = id
 
+    # add a new entry for this key to each component it uses
     for name, component of components
       @addComponentToKey id, name, component
 
@@ -51,14 +53,20 @@ class Pocket
   keys: (keys...) ->
     @key(cmps) for cmps in _.flatten(keys)
 
-  ##*
-  # Returns an array of all keys currently in the pocket.
-  # @return {Array<String>} all the keys in the pocket
+  ###*
+   * Returns an array of all keys currently in the pocket.
+   * @return {Array<String>} all the keys in the pocket
+  ###
   getKeys: -> _.keys @_keys
 
   destroyKey: (id) ->
     @_keysToDestroy[id] = true
 
+  ###*
+   * Deletes key entry and all component data about it.
+   * This operation is UNSAFE, prefer using {::destroyKey} which allows the
+   * Pocket to delete keys at its earliest, safe convenience.
+  ###
   immediatelyDestroyKey: (id) ->
     unless @_keys[id]
       throw new Error("key with id #{id} already destroyed")
@@ -125,15 +133,16 @@ class Pocket
     unless key
       throw new Error "could not find key with id #{id}"
 
-    others = @_components[componentName] ?= {}
-    comp = others[id]
+    component = @_components[componentName] ?= {}
+    cmpEntry = component[id]
 
-    unless comp
-      comp = others[id] = {}
-      componentDef = @_componentTypes[componentName]
-
-      if componentDef
-        componentDef(comp, options ? {})
+    unless cmpEntry
+      # add a new entry for this key
+      cmpEntry = component[id] = {}
+      cmpInitializer = @_componentTypes[componentName]
+      if cmpInitializer
+        # initialize the component with user options
+        cmpInitializer(cmpEntry, options ? {})
       else if !@_labels[componentName]
         @_labels[componentName] = true
         console.log "Found no component definition for '#{componentName}', assuming it's a label."
@@ -190,12 +199,17 @@ class Pocket
       # keys contains keys that have all components
       keys = @filterKeys system.requiredComponents
       # run the action!
-      # continue unless keys.length and reqs.length
-      # console.log "running '#{system.name}' on", keys
       system.action @, keys, reqs...
 
-  tick: (time) =>
+  ###*
+   * Perform one tick of the Pocket environment: destroy marked keys and run all systems.
+   * This function is intended to be wrapped in a `requestAnimationFrame` loop so it will
+   * be run every frame.
+   * @param {DOMHighResTimeStamp} time a timestamp from `requestAnimationFrame`
+  ###
+  tick: (time) ->
     @_destroyMarkedKeys()
     @_runSystems()
+    return
 
 module.exports = Pocket
