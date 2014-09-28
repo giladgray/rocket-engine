@@ -8,7 +8,6 @@ Many thanks to kirbysayshi for inspiration and code samples.
 @see https://github.com/kirbysayshi/pocket-ces
  */
 var Pocket, System, _,
-  __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
   __slice = [].slice;
 
 _ = require('lodash');
@@ -16,8 +15,9 @@ _ = require('lodash');
 System = require('./system.coffee');
 
 Pocket = (function() {
+  Pocket.System = System;
+
   function Pocket() {
-    this.tick = __bind(this.tick, this);
     this._componentTypes = {};
     this._keys = {};
     this._labels = {};
@@ -31,7 +31,7 @@ Pocket = (function() {
 
 
   /**
-   * Store a new key in the Pocket
+   * Store a new key in the Pocket.
    * @param  {Object} components mapping of component or label names to initial values
    * @return {String}            ID of new key
    */
@@ -71,6 +71,12 @@ Pocket = (function() {
     return _results;
   };
 
+
+  /**
+   * Returns an array of all keys currently in the pocket.
+   * @return {Array<String>} all the keys in the pocket
+   */
+
   Pocket.prototype.getKeys = function() {
     return _.keys(this._keys);
   };
@@ -78,6 +84,13 @@ Pocket = (function() {
   Pocket.prototype.destroyKey = function(id) {
     return this._keysToDestroy[id] = true;
   };
+
+
+  /**
+   * Deletes key entry and all component data about it.
+   * This operation is UNSAFE, prefer using {::destroyKey} which allows the
+   * Pocket to delete keys at its earliest, safe convenience.
+   */
 
   Pocket.prototype.immediatelyDestroyKey = function(id) {
     var cmp, name, _ref, _results;
@@ -176,18 +189,18 @@ Pocket = (function() {
    */
 
   Pocket.prototype.addComponentToKey = function(id, componentName, options) {
-    var comp, componentDef, key, others, _base;
+    var cmpEntry, cmpInitializer, component, key, _base;
     key = this._keys[id];
     if (!key) {
       throw new Error("could not find key with id " + id);
     }
-    others = (_base = this._components)[componentName] != null ? _base[componentName] : _base[componentName] = {};
-    comp = others[id];
-    if (!comp) {
-      comp = others[id] = {};
-      componentDef = this._componentTypes[componentName];
-      if (componentDef) {
-        componentDef(comp, options != null ? options : {});
+    component = (_base = this._components)[componentName] != null ? _base[componentName] : _base[componentName] = {};
+    cmpEntry = component[id];
+    if (!cmpEntry) {
+      cmpEntry = component[id] = {};
+      cmpInitializer = this._componentTypes[componentName];
+      if (cmpInitializer) {
+        cmpInitializer(cmpEntry, options != null ? options : {});
       } else if (!this._labels[componentName]) {
         this._labels[componentName] = true;
         console.log("Found no component definition for '" + componentName + "', assuming it's a label.");
@@ -287,9 +300,17 @@ Pocket = (function() {
     return _results;
   };
 
+
+  /**
+   * Perform one tick of the Pocket environment: destroy marked keys and run all systems.
+   * This function is intended to be wrapped in a `requestAnimationFrame` loop so it will
+   * be run every frame.
+   * @param {DOMHighResTimeStamp} time a timestamp from `requestAnimationFrame`
+   */
+
   Pocket.prototype.tick = function(time) {
     this._destroyMarkedKeys();
-    return this._runSystems();
+    this._runSystems();
   };
 
   return Pocket;
