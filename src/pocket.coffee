@@ -54,7 +54,7 @@ class Pocket
   # @return {Array<String>} all the keys in the pocket
   getKeys: -> _.keys @_keys
 
-  destroyKey = (id) ->
+  destroyKey: (id) ->
     @_keysToDestroy[id] = true
 
   immediatelyDestroyKey: (id) ->
@@ -79,7 +79,6 @@ class Pocket
       compFn = (defaults, comp, options={}) ->
         _.defaults comp, _.clone(defaults, true)
         _.assign comp, options
-        # _.defaults comp, _.clone(defaults, true)
       initializer = _.partial compFn, initializer
     unless _.isFunction initializer
       throw new Error 'Unexpected component initializer type. Must be function or object.'
@@ -132,7 +131,7 @@ class Pocket
       componentDef = @_componentTypes[componentName]
 
       if componentDef
-        componentDef(comp, options)
+        componentDef(comp, options ? {})
       else if !@_labels[componentName]
         @_labels[componentName] = true
         console.log "Found no component definition for '#{componentName}', assuming it's a label."
@@ -175,6 +174,26 @@ class Pocket
   ###
   getSystems: -> _.pluck @_systems, 'name'
 
+  # delete all keys marked for deletion
+  _destroyMarkedKeys: ->
+    for key of @_keysToDestroy
+      @immediatelyDestroyKey key
+      delete @_keysToDestroy[key] # TODO: can this be done in loop?
 
+  # run all registered, valid systems
+  _runSystems: ->
+    for system in @_systems
+      # reqs contains all keys that have any of the names
+      reqs = system.requiredComponents.map (name) => @_components[name] or {}
+      # keys contains keys that have all components
+      keys = @filterKeys system.requiredComponents
+      # run the action!
+      # continue unless keys.length and reqs.length
+      # console.log "running '#{system.name}' on", keys
+      system.action @, keys, reqs...
+
+  tick: (time) =>
+    @_destroyMarkedKeys()
+    @_runSystems()
 
 module.exports = Pocket
