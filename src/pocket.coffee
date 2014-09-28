@@ -155,10 +155,20 @@ class Pocket
    * @param  {String}        name name of the system
    * @param  {Array<String>} reqs array of required component names
    * @param  {Function}      fn   system action function, invoked with
-   *                              (pocket, keys[], name1[], ... nameN[])
+   *                              (pocket, keys[], cName1{}, ..., cNameN{})
   ###
   system: (name, reqs, fn) ->
     @_systems.push if name instanceof System then name else new System(name, reqs, fn)
+
+  ###*
+   * Register a new System in the Pocket that calls its function *for each* key
+   * that matches the requirements, to reduce boilerplate.
+   * @param {String}        name name of the system
+   * @param {Array<String>} reqs array of required component names
+   * @param {Function}      fn   system action function for each key, invoked with
+   *                             (pocket, key, cValue1, ..., cValueN)
+  ###
+  systemForEach: (name, reqs, fn) -> @system System.forEach(name, reqs, fn)
 
   ###*
    * Internal: Returns array with all system names

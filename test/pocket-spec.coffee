@@ -126,3 +126,12 @@ describe 'Pocket', ->
       sys = new System('test', [], ->)
       pocket.system sys
       expect(pocket.getSystems()).to.have.members ['test']
+
+  describe '#systemForEach', ->
+    movementEach = (pkt, key, pos, vel) ->
+      pos.x += vel.x
+      pos.y += vel.y
+
+    it 'should register a new system', ->
+      pocket.systemForEach 'movement', ['position', 'velocity'], movementEach
+      expect(pocket.getSystems()).to.have.members ['movement']
