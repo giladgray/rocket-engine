@@ -2,6 +2,7 @@ chai = require 'chai'
 expect = chai.expect
 
 Pocket = require '../src/pocket.coffee'
+System = require '../src/system.coffee'
 
 describe 'Pocket', ->
   pocket = null
@@ -110,3 +111,18 @@ describe 'Pocket', ->
 
     it 'should return empty array if no keys match', ->
       expect(pocket.filterKeys ['amoeba']).to.be.empty
+
+  describe '#system', ->
+    movement = (pkt, keys, position, velocity) ->
+      for key in keys
+        position[key].x += velocity[key].x
+        position[key].y += velocity[key].y
+
+    it 'should register a new system', ->
+      pocket.system('movement', ['position', 'velocity'], movement)
+      expect(pocket.getSystems()).to.have.members ['movement']
+
+    it 'should accept instance of System', ->
+      sys = new System('test', [], ->)
+      pocket.system sys
+      expect(pocket.getSystems()).to.have.members ['test']

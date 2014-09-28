@@ -7,6 +7,7 @@ Many thanks to kirbysayshi for inspiration and code samples.
 ###
 
 _ = require 'lodash'
+System = require './system.coffee'
 
 class Pocket
   constructor: ->
@@ -14,10 +15,12 @@ class Pocket
 
     @_keys = {}
     @_labels = {}
-    @_systems = {}
+    @_systems = []
     @_components = {}
 
     @_keysToDestroy = {}
+
+  ### KEYS ###
 
   ###*
    * Store a new key in the Pocket
@@ -61,6 +64,8 @@ class Pocket
     for name, cmp of @_components
       delete @_components[name][id]
 
+  ### COMPONENTS ###
+
   ###*
    * Register a new named component type in the Pocket.
    * @param {String} name        name of component
@@ -99,6 +104,16 @@ class Pocket
   getComponent: (name) -> @_components[name]
 
   ###*
+   * Returns the contents of the first key associated with the component name.
+   * @param {String} name name of component to query for data
+  ###
+  getData: (name) ->
+    data = @_components[name]
+    return data[_.keys(data)[0]]
+
+  ### KEYS + COMPONENTS ###
+
+  ###*
    * Adds a new instance to the given component under the given ID with options
    * @param {String} id            id of key
    * @param {String} componentName name of component
@@ -124,14 +139,6 @@ class Pocket
     return
 
   ###*
-   * Returns the contents of the first key associated with the component name.
-   * @param {String} name name of component to query for data
-  ###
-  getData: (name) ->
-    data = @_components[name]
-    return data[_.keys(data)[0]]
-
-  ###*
    * Returns an array of keys that contain all the given components.
    * @param {Array<String>} componentArray array of component names
    * @return {Array<String>} array of matching key IDs
@@ -140,5 +147,24 @@ class Pocket
     componentHasKey = (name) => @_components[name][id]?
     # build up comprehension of all keys that pass the 'all components' test
     return (id for id of @_keys when _.all componentArray, componentHasKey)
+
+  ### SYSTEMS ###
+
+  ###*
+   * Register a new System in the Pocket.
+   * @param  {String}        name name of the system
+   * @param  {Array<String>} reqs array of required component names
+   * @param  {Function}      fn   system action function, invoked with
+   *                              (pocket, keys[], name1[], ... nameN[])
+  ###
+  system: (name, reqs, fn) ->
+    @_systems.push if name instanceof System then name else new System(name, reqs, fn)
+
+  ###*
+   * Internal: Returns array with all system names
+  ###
+  getSystems: -> _.pluck @_systems, 'name'
+
+
 
 module.exports = Pocket
