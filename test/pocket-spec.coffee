@@ -2,7 +2,6 @@ chai = require 'chai'
 expect = chai.expect
 
 Pocket = require '../src/pocket.coffee'
-System = require '../src/system.coffee'
 
 describe 'Pocket', ->
   pocket = null
@@ -123,7 +122,7 @@ describe 'Pocket', ->
       expect(pocket.getSystems()).to.have.members ['movement']
 
     it 'should accept instance of System', ->
-      sys = new System('test', [], ->)
+      sys = new Pocket.System('test', [], ->)
       pocket.system sys
       expect(pocket.getSystems()).to.have.members ['test']
 

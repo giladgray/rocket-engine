@@ -10,6 +10,8 @@ _ = require 'lodash'
 System = require './system.coffee'
 
 class Pocket
+  @System: System
+
   constructor: ->
     @_componentTypes = {}
 
