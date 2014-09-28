@@ -1,0 +1,31 @@
+body {
+  font-family: sans-serif;
+  text-align: center;
+  margin: 1em; }
+
+pre {
+  text-align: left;
+  width: 600px;
+  margin: auto;
+  padding: 1.5em 0 1em;
+  color: white;
+  background: #1e1e1e;
+  border: 1px solid black;
+  border-radius: 4px; }
+
+ul {
+  list-style-type: none;
+  padding: 0; }
+  ul li {
+    display: inline-block;
+    font-size: 20px; }
+
+a {
+  text-decoration: none; }
+  a:hover {
+    text-decoration: underline; }
+
+.byline {
+  position: fixed;
+  bottom: 1em;
+  right: 1em; }
