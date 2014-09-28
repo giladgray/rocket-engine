@@ -1,7 +1,7 @@
 Pocket
 ======
 
-> A little game engine that fits in your pocket
+> A little game engine that fits in your pocket.
 
 ## Development
 1. `npm install`
@@ -13,31 +13,29 @@ Pocket = require 'pocket'
 
 pocket = new Pocket
 
-# 1. define components...
-# ... as default values
-pocket.component 'position', {x: 0, y: 0}
-# ... or as functions
-pocket.component 'velocity', (cmp, options) ->
-  cmp.velocity = {x: options.x ? 0, y: options.y ? 0}
+# 1. define components as functions...
+pocket.component 'position', (cmp, options) ->
+  cmp = {x: options.x ? 0, y: options.y ? 0}
+# ...or as default values
+pocket.component 'velocity', {x: 0, y: 0}
 
-# 2. define systems that operate on keys with specific
-# components or labels.
-pocket.system 'apply-velocity', # friendly name
-  # required components or labels for a key
+# 2. define systems that operate on keys with specific components
+pocket.systemForEach 'move', # friendly name
+  # required components for a key
   ['position', 'velocity'],
   # function to call for each key that has all components
   (pocket, key, position, velocity) ->
     position.x += velocity.x
     position.y += velocity.y
 
-# 3. add keys that contain components or labels.
+# 3. add keys that contain components
 pocket.key {
-  spaceship: null # a label
-  position: {x: WIDTH / 2, y: HEIGHT / 2}
-  velocity: null # use default component values
+  spaceship : null # a label*
+  velocity  : null # use default component values
+  position  : {x: WIDTH / 2, y: HEIGHT / 2}
 }
 
-# a label is simply a component without a definition,
+# * a label is simply a component without a definition,
 # used to tag keys for easy discovery.
 ```
 
@@ -57,6 +55,16 @@ pocket.system 'inital-badguy-generation', (pocket) ->
       position: randomPosition()
       health: 10
       speed: i
+
+# a system that operates on multiple keys can use systemForEach
+# to reduce boilerplate. turn this:
+pocket.system 'move', ['position', 'velocity'],
+  (pocket, keys, position, velocity) ->
+    for key in keys
+      Vector.add position[key], velocity[key]
+# into this:
+pocket.systemForEach 'move', ['position', 'velocity'],
+  (pocket, key, pos, vel) -> Vector.add pos, vel
 
 # more advanced systems on the way:
 # - input components: keyboard and mouse
