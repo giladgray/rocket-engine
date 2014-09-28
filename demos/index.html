@@ -1,0 +1,51 @@
+<html>
+  <head>
+    <title>Pocket.js</title>
+    <link rel="stylesheet" href="index.css" media="screen" charset="utf-8">
+  </head>
+  <body>
+    <h1>Pocket.js</h1>
+    <h3>A little game engine that fits in your pocket.</h3>
+    <h3><a href="https://github.com/giladgray/pocket">Source on GitHub</a></h3>
+    <pre>
+      <code>
+      Pocket = require 'pocket'
+
+      pocket = new Pocket
+
+      # 1. define components as functions that assign values...
+      pocket.component 'position', (cmp, options) ->
+        cmp = {x: options.x ? 0, y: options.y ? 0}
+      # ...or as default value objects
+      pocket.component 'velocity', {x: 0, y: 0}
+
+      # 2. define systems that operate on keys with specific components
+      pocket.systemForEach 'move', # friendly name
+        # required components for a key
+        ['position', 'velocity'],
+        # function to call for each key that has all components
+        (pocket, key, position, velocity) ->
+          position.x += velocity.x
+          position.y += velocity.y
+
+      # 3. add keys that contain components
+      pocket.key {
+        spaceship : null # a label*
+        velocity  : null # use default component values
+        position  : {x: WIDTH / 2, y: HEIGHT / 2}
+      }
+
+      # * a label is simply a component without a definition,
+      # used to tag keys for easy discovery.
+      </code>
+    </pre>
+
+    <h2>Demos</h2>
+    <ul>
+      <li><a href="bounce">Bounce</a></li>
+    </ul>
+    <small class="byline">
+      Gilad Gray, 2014
+    </small>
+  </body>
+</html>
