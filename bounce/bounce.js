@@ -94,11 +94,13 @@
     }
   });
 
-  start = function() {
-    pocket.tick();
+  start = function(time) {
+    pocket.tick(time);
     return window.requestAnimationFrame(start);
   };
 
-  start();
+  document.addEventListener('DOMContentLoaded', function() {
+    return start();
+  });
 
 }).call(this);
