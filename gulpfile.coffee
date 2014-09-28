@@ -11,15 +11,10 @@ sources =
   demos : 'demos/{,*}/*.coffee'
   spec  : 'test/**/*.coffee'
 
-destinations =
-  css  : 'dist/'
-  html : 'dist/'
-  js   : 'dist/'
-
-gulp.task 'default', ->
+destination = 'dist/'
 
 gulp.task 'clean', ->
-  gulp.src destinations.html
+  gulp.src destination
       .pipe require('gulp-clean')()
 
 gulp.task 'lint', ->
@@ -30,55 +25,66 @@ gulp.task 'lint', ->
       .pipe coffeelint.reporter('fail').on 'error',
         notify.onError('<%= error.message %>')
 
-gulp.task 'html', ->
-  gulp.src sources.html
-      .pipe gulp.dest(destinations.html)
-
-gulp.task 'sass', ->
-  sass = require 'gulp-sass'
-  gulp.src sources.sass
-      .pipe sass()
-      .pipe gulp.dest(destinations.css)
-
-gulp.task 'src', ->
-  source = require 'vinyl-source-stream'
-  browserify = require 'browserify'
-  browserify './src/pocket.coffee', {standalone: 'Pocket'}
-    .bundle()
-    .pipe source('pocket.js')
-    .pipe gulp.dest(destinations.js)
-
-gulp.task 'demos', ->
-  coffee = require 'gulp-coffee'
-  gulp.src sources.demos, base: 'demos'
-      .pipe coffee().on 'error', gutil.log
-      .pipe gulp.dest(destinations.js)
-
 gulp.task 'test', ->
   mocha = require 'gulp-mocha'
   gulp.src sources.spec
       .pipe mocha({reporter: 'spec'})
         .on 'error', notify.onError('Mocha: <%= error.message %>')
 
-# Reloads the page for us
-gulp.task 'browser-sync', ->
+gulp.task 'html', ->
+  gulp.src sources.html
+      .pipe gulp.dest(destination)
+
+gulp.task 'sass', ->
+  sass = require 'gulp-sass'
+  gulp.src sources.sass
+      .pipe sass()
+      .pipe gulp.dest(destination)
+
+gulp.task 'src', ->
+  # bundle Pocket library into pocket.js, export global
+  source = require 'vinyl-source-stream'
+  browserify = require 'browserify'
+  browserify './src/pocket.coffee', {standalone: 'Pocket'}
+    .bundle()
+    .pipe source('pocket.js')
+    .pipe gulp.dest(destination)
+
+gulp.task 'demos', ->
+  # compile demo scripts
+  coffee = require 'gulp-coffee'
+  gulp.src sources.demos, base: 'demos'
+      .pipe coffee().on 'error', gutil.log
+      .pipe gulp.dest(destination)
+
+# Compile all sources!
+gulp.task 'build', ['html', 'sass', 'src', 'demos']
+
+# Reloads the page for us, but first builds all the sources
+gulp.task 'browserSync', ['build'], ->
   browserSync.init null,
     open: true
     server:
-      baseDir: destinations.html
+      baseDir: destination
     watchOptions:
       debounceDelay: 1000
 
-gulp.task 'watch', ->
+# Watch files, but first launch server
+gulp.task 'watch', ['browserSync'], ->
+  # recompile sources
   gulp.watch [sources.src, sources.spec], ['lint', 'test', 'src']
   gulp.watch sources.demos, ['demos']
   gulp.watch sources.sass, ['sass']
   gulp.watch sources.html, ['html']
-
+  # trigger reload when compiled files change
   gulp.watch 'dist/**', (file) ->
     browserSync.reload(file.path) if file.type is "changed"
 
+# Do everything! build, browserSync, watch
+gulp.task 'default', ['watch']
+
+# Push to
 gulp.task 'deploy', ->
   deploy = require 'gulp-gh-pages'
-  gulp.src('./dist/**/*')
+  gulp.src("./#{destination}/**/*")
       .pipe deploy()
