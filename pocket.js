@@ -85,6 +85,18 @@ Pocket = (function() {
     return this._keysToDestroy[id] = true;
   };
 
+  Pocket.prototype.destroyKeys = function() {
+    var id, ids, _i, _len, _ref, _results;
+    ids = 1 <= arguments.length ? __slice.call(arguments, 0) : [];
+    _ref = _.flatten(ids);
+    _results = [];
+    for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+      id = _ref[_i];
+      _results.push(this.destroyKey(id));
+    }
+    return _results;
+  };
+
 
   /**
    * Deletes key entry and all component data about it.

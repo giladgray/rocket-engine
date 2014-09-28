@@ -18,12 +18,20 @@ pre {
   border: 1px solid black;
   border-radius: 4px; }
 
+kbd {
+  background: #eee;
+  border: 1px solid #ccc;
+  border-radius: 3px;
+  padding: 0 2px; }
+
 ul {
   list-style-type: none;
   padding: 0; }
   ul li {
     display: inline-block;
     font-size: 20px; }
+  ul li + li {
+    margin-left: 1em; }
 
 a {
   text-decoration: none; }
