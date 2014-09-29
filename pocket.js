@@ -201,9 +201,8 @@ Pocket = (function() {
    */
 
   Pocket.prototype.addComponentToKey = function(id, componentName, options) {
-    var cmpEntry, cmpInitializer, component, key, _base;
-    key = this._keys[id];
-    if (!key) {
+    var cmpEntry, cmpInitializer, component, _base;
+    if (!this._keys[id]) {
       throw new Error("could not find key with id " + id);
     }
     component = (_base = this._components)[componentName] != null ? _base[componentName] : _base[componentName] = {};
@@ -223,12 +222,14 @@ Pocket = (function() {
 
   /**
    * Returns an array of keys that contain all the given components.
-   * @param {Array<String>} componentArray array of component names
+   * @param {Array<String>} componentArray array or splat of component names
    * @return {Array<String>} array of matching key IDs
    */
 
-  Pocket.prototype.filterKeys = function(componentArray) {
-    var componentHasKey, id;
+  Pocket.prototype.filterKeys = function() {
+    var componentArray, componentHasKey, id, names;
+    componentArray = 1 <= arguments.length ? __slice.call(arguments, 0) : [];
+    names = _.flatten(componentArray);
     componentHasKey = (function(_this) {
       return function(name) {
         return _this._components[name][id] != null;
@@ -238,7 +239,7 @@ Pocket = (function() {
       var _results;
       _results = [];
       for (id in this._keys) {
-        if (_.all(componentArray, componentHasKey)) {
+        if (_.all(names, componentHasKey)) {
           _results.push(id);
         }
       }
@@ -321,6 +322,8 @@ Pocket = (function() {
    */
 
   Pocket.prototype.tick = function(time) {
+    this.delta = time - this.time;
+    this.time = time;
     this._destroyMarkedKeys();
     this._runSystems();
   };
@@ -330,6 +333,19 @@ Pocket = (function() {
 })();
 
 module.exports = Pocket;
+
+
+/*
+TODO
+- firstKey(componentName) returns first key for that component, useful when you only have one
+  (like the player's ship in Asteroids)
+  - firstData(componentName) returns the data associated with first key for a *single* component
+  - firstKey(componentName) returns the first key for a component, which you can use to get all its
+    other data
+- dataFor(key, componentName) returns key's data for component, useful to retrieve data associated
+  with firstKey('ship')
+  - dataFor(key) constructs the entire data object? this would be expensive so be careful!
+ */
 
 
 
