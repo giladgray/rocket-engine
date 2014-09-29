@@ -67,7 +67,7 @@ pocket.key
 # keyboard commands
 pocket.systemForEach 'input-balls', ['keyboard-state'], (pocket, key, keyboard) ->
   if keyboard.isNewPress 'DESTROY'
-    pocket.destroyKeys pocket.filterKeys(['ball'])
+    pocket.destroyKeys pocket.filterKeys('ball')
     updateCount(0)
   if keyboard.isNewPress 'ADD'
     randomBall()

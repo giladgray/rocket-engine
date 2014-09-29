@@ -108,8 +108,12 @@ describe 'Pocket', ->
       expect(pocket.filterKeys ['position', 'mass']).to.have.length 3
       expect(pocket.filterKeys ['density']).to.have.length 3
 
+    it 'should accept splat of names instead of array', ->
+      expect(pocket.filterKeys 'position', 'velocity', ['density']).to.have.length 2
+      expect(pocket.filterKeys 'density').to.have.length 3
+
     it 'should return empty array if no keys match', ->
-      expect(pocket.filterKeys ['amoeba']).to.be.empty
+      expect(pocket.filterKeys 'amoeba').to.be.empty
 
   describe '#system', ->
     movement = (pkt, keys, position, velocity) ->

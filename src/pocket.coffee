@@ -151,13 +151,14 @@ class Pocket
 
   ###*
    * Returns an array of keys that contain all the given components.
-   * @param {Array<String>} componentArray array of component names
+   * @param {Array<String>} componentArray array or splat of component names
    * @return {Array<String>} array of matching key IDs
   ###
-  filterKeys: (componentArray) ->
+  filterKeys: (componentArray...) ->
+    names = _.flatten componentArray
     componentHasKey = (name) => @_components[name][id]?
     # build up comprehension of all keys that pass the 'all components' test
-    return (id for id of @_keys when _.all componentArray, componentHasKey)
+    return (id for id of @_keys when _.all names, componentHasKey)
 
   ### SYSTEMS ###
 
