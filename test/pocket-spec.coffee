@@ -85,6 +85,16 @@ describe 'Pocket', ->
       pocket.key {config: null}
       expect(pocket.getData 'config').to.deep.equal config
 
+  describe '#dataFor', ->
+    it 'should return component value associated with key when it exists', ->
+      pocket.component 'position', {x: 10}
+      key = pocket.key {position: null}
+      expect(pocket.dataFor key, 'position').to.deep.equal {x: 10}
+
+    it 'should return undefined when value does not exist', ->
+      expect(pocket.dataFor 'key', 'position').to.be.undefined
+      expect(pocket.dataFor 'key').to.be.undefined
+
   describe '#filterKeys', ->
     beforeEach ->
       pocket.components
@@ -129,6 +139,22 @@ describe 'Pocket', ->
       sys = new Pocket.System('test', [], ->)
       pocket.system sys
       expect(pocket.getSystems()).to.have.members ['test']
+
+    describe 'component interference', ->
+      key1 = key2 = key3 = null
+      beforeEach ->
+        pocket.component 'square', {size: 10, color: 'red'}
+        key1 = pocket.key {one: null, square: null}
+        key2 = pocket.key {two: null, square: null}
+        key3 = pocket.key {three: null, square: {size: 10, color: 'blue'}}
+
+      it 'changing component value in system should not affect other instances', ->
+        pocket.systemForEach 'one', ['square', 'one'], (p, k, square) ->
+          square.color = 'green'
+        pocket.tick()
+        expect(pocket.dataFor(key1, 'square').color).to.equal 'green'
+        expect(pocket.dataFor(key2, 'square').color).to.equal 'red'
+        expect(pocket.dataFor(key3, 'square').color).to.equal 'blue'
 
   describe '#systemForEach', ->
     movementEach = (pkt, key, pos, vel) ->

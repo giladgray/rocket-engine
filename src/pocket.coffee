@@ -121,6 +121,8 @@ class Pocket
     data = @_components[name]
     return data[_.keys(data)[0]]
 
+  dataFor: (key, name) -> @_components[name]?[key]
+
   ### KEYS + COMPONENTS ###
 
   ###*
