@@ -4,6 +4,15 @@ random = (min, max) ->
     min = 0
   return Math.floor(Math.random() * (max - min)) + min
 
+rectangle = (rect1...) ->
+  overlaps: (rect2...) ->
+    xOverlap = yOverlap = true
+    if rect1[0] > rect2[0] + rect2[2] or rect1[0] + rect1[2] < rect2[0]
+      xOverlap = false
+    if rect1[1] > rect2[1] + rect2[3] or rect1[1] + rect1[3] < rect2[1]
+      yOverlap = false
+    return xOverlap and yOverlap
+
 pocket = new Pocket
 
 # context-2d component for storing CanvasRenderingContext2D and other canvas info
@@ -72,7 +81,7 @@ pocket.component 'velocity', {x: 0, y: 0}
 pocket.component 'square',   {size: 30, color: 'cornflowerblue', angle: 0}
 pocket.component 'barrier',  {height: 30, gapWidth: BARRIER_WIDTH, x: 0, y: 0, color: 'cornflowerblue'}
 
-pocket.key
+pocket.player = pocket.key
   amazing: true
   square: {color: 'black', angle: Math.PI / 4}
   position: {x: ctx.center.x, y: ctx.center.y + ctx.height / 4}
@@ -98,6 +107,28 @@ addLevel = ->
       y: barrier.y - BARRIER_DISTANCE / 3
   lastBarrierX = barrier.x
 addLevel() for i in [1..3]
+
+score = 0
+scoreEl = document.querySelector '.score'
+scoreOne = ->
+  scoreEl.textContent = score++
+
+pocket.system 'level-barrier', ['barrier', 'evil'], (pocket, keys, barriers) ->
+  pPos = pocket.dataFor pocket.player, 'position'
+  pSq  = pocket.dataFor pocket.player, 'square'
+  playerRect = rectangle(pPos.x, pPos.y + ctx.width / 3, pSq.size, pSq.size)
+  for key in keys
+    barrier = barriers[key]
+    continue if barrier.marked
+    if playerRect.overlaps(0, barrier.y, ctx.width, barrier.height)
+      console.log 'boom', key, barrier, pPos, pSq.size
+      barrier.color = 'red'
+      barrier.marked = true
+    if playerRect.overlaps(barrier.x, barrier.y, barrier.gapWidth, barrier.height)
+      barrier.color = 'green'
+      barrier.marked = true
+      console.log 'blast', key
+      scoreOne()
 
 # keyboard commands
 MOVE = {x: 2, y: 12}
@@ -137,10 +168,11 @@ pocket.system 'clear-canvas', [], (pocket) ->
 
 # draw each square
 pocket.systemForEach 'draw-square', ['position', 'square'], (pocket, key, pos, square) ->
+  isAmazing = pocket.dataFor(key, 'amazing')
   {g2d, center, width} = ctx
   g2d.save()
   g2d.beginPath()
-  g2d.translate(pos.x, pos.y - center.y + width / 3)
+  g2d.translate pos.x, pos.y - center.y + if isAmazing then width / 3 else 0
   g2d.rotate(square.angle)
   g2d.fillStyle = square.color
   g2d.rect 0, 0, square.size, square.size
