@@ -189,6 +189,11 @@ Pocket = (function() {
     return data[_.keys(data)[0]];
   };
 
+  Pocket.prototype.dataFor = function(key, name) {
+    var _ref;
+    return (_ref = this._components[name]) != null ? _ref[key] : void 0;
+  };
+
 
   /* KEYS + COMPONENTS */
 

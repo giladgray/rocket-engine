@@ -1,0 +1,10 @@
+.scores {
+  position: absolute;
+  left: 50%;
+  width: 4em;
+  margin-left: -2em;
+  text-align: center;
+  font-size: 3em; }
+  .scores .best {
+    font-size: 0.5em;
+    color: #666; }
