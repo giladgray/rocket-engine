@@ -57,16 +57,20 @@ pocket.key
       37: 'LEFT'
       39: 'RIGHT'
 
-# game components
-pocket.component 'position', {x: 0, y: 0}
-pocket.component 'velocity', {x: 0, y: 0}
-pocket.component 'square',   {size: 30, color: 'cornflowerblue', angle: 0}
-pocket.component 'barrier',  {height: 30, gapWidth: 200, x: 0, y: 0, color: 'cornflowerblue'}
+
+# constants
 ctx = pocket.getData 'context-2d'
 ctx.center = {x: ctx.width / 2, y: ctx.height / 2}
 
 GRAVITY = 0.4
 BARRIER_DISTANCE = ctx.height * 3 / 4
+BARRIER_WIDTH = 200
+
+# game components
+pocket.component 'position', {x: 0, y: 0}
+pocket.component 'velocity', {x: 0, y: 0}
+pocket.component 'square',   {size: 30, color: 'cornflowerblue', angle: 0}
+pocket.component 'barrier',  {height: 30, gapWidth: BARRIER_WIDTH, x: 0, y: 0, color: 'cornflowerblue'}
 
 pocket.key
   amazing: true
@@ -74,19 +78,26 @@ pocket.key
   position: {x: ctx.center.x, y: ctx.center.y + ctx.height / 4}
   velocity: null
 
-for i in [-1..3]
-  pocket.key
-    evil: true
-    barrier: {x: ctx.center.x + random(-150, 150), y: 100 - BARRIER_DISTANCE * i}
-
-  pocket.key
-    evil: true
-    square: null
-    position: {x: ctx.center.x + random(-200, 200), y: -BARRIER_DISTANCE * i - ctx.height / 4 * 3}
+level = -1
+lastBarrierX = ctx.center.x
+addLevel = ->
+  barrier = {x: ctx.center.x + random(-150, 150), y: 100 - BARRIER_DISTANCE * level++}
+  squareX = (barrier.x + lastBarrierX) / 2 + BARRIER_WIDTH / 2
+  pocket.key {evil: true, barrier}
   pocket.key
     evil: true
     square: null
-    position: {x: ctx.center.x + random(-200, 200), y: -BARRIER_DISTANCE * i - ctx.height / 4 * 2}
+    position:
+      x: squareX + random(-BARRIER_WIDTH / 2, BARRIER_WIDTH / 2)
+      y: barrier.y - BARRIER_DISTANCE * 2 / 3
+  pocket.key
+    evil: true
+    square: null
+    position:
+      x: squareX + random(-BARRIER_WIDTH / 2, BARRIER_WIDTH / 2)
+      y: barrier.y - BARRIER_DISTANCE / 3
+  lastBarrierX = barrier.x
+addLevel() for i in [1..3]
 
 # keyboard commands
 MOVE = {x: 2, y: 12}
@@ -112,14 +123,13 @@ pocket.systemForEach 'move', ['position', 'velocity'], (pocket, key, pos, vel) -
   ctx.center.y = Math.min(ctx.center.y, pos.y)
 
 # move barriers and evil squares ahead once you pass them so they'll get reused
-pocket.systemForEach 'bump-barrier', ['barrier', 'evil'], (pocket, key, barrier) ->
+pocket.systemForEach 'destroy-barrier', ['barrier', 'evil'], (pocket, key, barrier) ->
   if barrier.y - BARRIER_DISTANCE * 2 > ctx.center.y
-    barrier.y = ctx.center.y - BARRIER_DISTANCE * 2
-    barrier.x = ctx.center.x + random(-150, 150)
-pocket.systemForEach 'bump-square', ['position', 'square', 'evil'], (pocket, key, pos) ->
+    pocket.destroyKey key
+    addLevel()
+pocket.systemForEach 'destroy-square', ['position', 'evil'], (pocket, key, pos) ->
   if pos.y - BARRIER_DISTANCE * 2 > ctx.center.y
-    pos.y = ctx.center.y - BARRIER_DISTANCE * 2
-    pos.x = ctx.center.x + random(-200, 200)
+    pocket.destroyKey key
 
 # clear the canvas each frame
 pocket.system 'clear-canvas', [], (pocket) ->
@@ -146,8 +156,8 @@ pocket.systemForEach 'draw-barrier', ['barrier'], (pocket, key, barrier) ->
   g2d.fillStyle = barrier.color
   g2d.rect 0, 0, barrier.x, barrier.height
   g2d.rect barrier.x + barrier.gapWidth, 0, width - barrier.gapWidth, barrier.height
-  g2d.closePath()
   g2d.fill()
+  g2d.closePath()
   g2d.restore()
 
 # render loop
