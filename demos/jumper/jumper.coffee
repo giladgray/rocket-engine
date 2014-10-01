@@ -79,11 +79,11 @@ BARRIER_WIDTH = 200
 pocket.component 'position', {x: 0, y: 0}
 pocket.component 'velocity', {x: 0, y: 0}
 pocket.component 'square',   {size: 30, color: 'cornflowerblue', angle: 0}
-pocket.component 'barrier',  {height: 30, gapWidth: BARRIER_WIDTH, x: 0, y: 0, color: 'cornflowerblue'}
+pocket.component 'barrier',  {height: 50, gapWidth: BARRIER_WIDTH, x: 0, y: 0, color: 'cornflowerblue'}
 
 pocket.player = pocket.key
   amazing: true
-  square: {color: 'black', angle: Math.PI / 4}
+  square: {color: 'black', angle: Math.PI / 4, size: 20}
   position: {x: ctx.center.x, y: ctx.center.y + ctx.height / 4}
   velocity: null
 
@@ -109,9 +109,15 @@ addLevel = ->
 addLevel() for i in [1..3]
 
 score = 0
-scoreEl = document.querySelector '.score'
+bestScore = 0
+scoreEl = document.querySelector '.scores .current'
+highscoreEl = document.querySelector '.scores .best'
 scoreOne = ->
-  scoreEl.textContent = score++
+  scoreEl.textContent = ++score
+scoreZero = ->
+  if score > bestScore
+    highscoreEl.textContent = bestScore = score
+  scoreEl.textContent = score = 0
 
 pocket.system 'level-barrier', ['barrier', 'evil'], (pocket, keys, barriers) ->
   pPos = pocket.dataFor pocket.player, 'position'
@@ -119,16 +125,28 @@ pocket.system 'level-barrier', ['barrier', 'evil'], (pocket, keys, barriers) ->
   playerRect = rectangle(pPos.x, pPos.y + ctx.width / 3, pSq.size, pSq.size)
   for key in keys
     barrier = barriers[key]
-    continue if barrier.marked
+    continue if barrier.marked?
     if playerRect.overlaps(0, barrier.y, ctx.width, barrier.height)
-      console.log 'boom', key, barrier, pPos, pSq.size
       barrier.color = 'red'
-      barrier.marked = true
+      barrier.marked = false
     if playerRect.overlaps(barrier.x, barrier.y, barrier.gapWidth, barrier.height)
       barrier.color = 'green'
       barrier.marked = true
-      console.log 'blast', key
       scoreOne()
+    if barrier.marked is false then scoreZero()
+
+pocket.system 'square-smash', ['position', 'square', 'evil'], (pocket, keys, positions, squares) ->
+  pPos = pocket.dataFor pocket.player, 'position'
+  pSq  = pocket.dataFor pocket.player, 'square'
+  playerRect = rectangle(pPos.x, pPos.y + ctx.width / 3, pSq.size, pSq.size)
+  for key in keys
+    position = positions[key]
+    square   = squares[key]
+    continue if square.marked
+    if playerRect.overlaps position.x, position.y, square.size, square.size
+      square.color = 'red'
+      square.marked = true
+      scoreZero()
 
 # keyboard commands
 MOVE = {x: 2, y: 12}
