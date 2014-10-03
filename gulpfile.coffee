@@ -7,7 +7,7 @@ browserSync = require 'browser-sync'
 sources =
   sass  : 'demos/{,*}/*.scss'
   html  : 'demos/{,*}/index.html'
-  src   : 'src/*.coffee'
+  src   : 'src/**/*.coffee'
   demos : 'demos/{,*}/*.coffee'
   spec  : 'test/**/*.coffee'
 
@@ -53,8 +53,12 @@ gulp.task 'src', ->
 gulp.task 'demos', ->
   # compile demo scripts
   coffee = require 'gulp-coffee'
+  sourcemaps = require 'gulp-sourcemaps'
   gulp.src sources.demos, base: 'demos'
-      .pipe coffee().on 'error', gutil.log
+      .pipe sourcemaps.init()
+      .pipe coffee()
+        .on 'error', notify.onError('Coffee: <%= error.message %>')
+      .pipe sourcemaps.write()
       .pipe gulp.dest(destination)
 
 # Compile all sources!
