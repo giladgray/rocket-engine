@@ -13,6 +13,7 @@ class Pocket
   @System: System
 
   constructor: ->
+    @time = 0
     @_componentTypes = {}
 
     @_keys = {}
@@ -132,8 +133,7 @@ class Pocket
    * @param {Object} options       options for component initializer
   ###
   addComponentToKey: (id, componentName, options) ->
-    key = @_keys[id]
-    unless key
+    unless @_keys[id]
       throw new Error "could not find key with id #{id}"
 
     component = @_components[componentName] ?= {}
@@ -158,7 +158,7 @@ class Pocket
   ###
   filterKeys: (componentArray...) ->
     names = _.flatten componentArray
-    componentHasKey = (name) => @_components[name][id]?
+    componentHasKey = (name) => @_components[name]?[id]?
     # build up comprehension of all keys that pass the 'all components' test
     return (id for id of @_keys when _.all names, componentHasKey)
 
@@ -212,6 +212,9 @@ class Pocket
    * @param {DOMHighResTimeStamp} time a timestamp from `requestAnimationFrame`
   ###
   tick: (time) ->
+    if time?
+      @delta = time - @time
+      @time  = time
     @_destroyMarkedKeys()
     @_runSystems()
     return
