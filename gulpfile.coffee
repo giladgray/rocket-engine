@@ -25,15 +25,28 @@ gulp.task 'lint', ->
       .pipe coffeelint.reporter('fail').on 'error',
         notify.onError('<%= error.message %>')
 
-gulp.task 'test', ->
+gulp.task 'test', ['test-web'], ->
   mocha = require 'gulp-mocha'
   gulp.src sources.spec
       .pipe mocha({reporter: 'spec'})
         .on 'error', notify.onError('Mocha: <%= error.message %>')
 
+gulp.task 'test-web', ->
+  sass = require 'gulp-sass'
+  source = require 'vinyl-source-stream'
+  browserify = require 'browserify'
+  browserify './test/web/index.coffee'
+    .bundle()
+    .pipe source('test/tests.js')
+    .pipe gulp.dest(destination)
+  gulp.src './node_modules/gulp-mocha/node_modules/mocha/mocha.*'
+    .pipe gulp.dest destination + '/test'
+
 gulp.task 'html', ->
   gulp.src sources.html
       .pipe gulp.dest(destination)
+  gulp.src 'test/web/index.html', base: 'test/web'
+      .pipe gulp.dest(destination + '/test')
 
 gulp.task 'sass', ->
   sass = require 'gulp-sass'
