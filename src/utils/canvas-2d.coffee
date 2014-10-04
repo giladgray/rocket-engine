@@ -36,9 +36,9 @@
  *         											 (default: `'auto'`)
 ###
 module.exports = (cmp, {canvas, width, height}) ->
-  autoWidth = width is 'auto'
+  autoWidth  = width is 'auto'
   autoheight = height is 'auto'
-  cmp.canvas = document.querySelector canvas or '#canvas'
+  cmp.canvas = document.querySelector canvas or 'canvas'
   cmp.g2d = cmp.canvas.getContext('2d')
   cmp.camera = {x: 0, y: 0}
 

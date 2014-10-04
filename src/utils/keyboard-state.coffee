@@ -40,7 +40,8 @@
  * @option {Object} keymap map of keyCodes to string names
 ###
 module.exports = (cmp, {target, keymap}) ->
-  cmp.target = if typeof target is 'string' then document.querySelector(target) else document
+  keymap ?= {}
+  cmp.target = if typeof target is 'string' then document.querySelector(target) else document.body
   cmp.down = {}
   # returns true if the named key was pressed in the last X milliseconds
   cmp.isNewPress = (keyName, recency = 10) ->
