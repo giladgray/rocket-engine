@@ -22,22 +22,22 @@
  *
  * @example
  *   # register the keyboard-state component
- * 	 pocket.component 'keyboard-state', require('pocket/utils/keyboard-state.coffee')
- * 	 # define a key with keymap for your game
- * 	 pocket.key {
- * 	 	'keyboard-state':
- * 	 		keymap:
- * 	 		  27: 'MENU'  # esc
- * 	 		  32: 'SHOOT' # space
- * 	 		  37: 'LEFT'  # left arrow
- * 	 		  39: 'RIGHT' # right arrow
- * 	 }
+ *   pocket.component 'keyboard-state', require('pocket/utils/keyboard-state.coffee')
+ *   # define a key with keymap for your game
+ *   pocket.key {
+ *     'keyboard-state':
+ *       keymap:
+ *         27: 'MENU'  # esc
+ *         32: 'SHOOT' # space
+ *         37: 'LEFT'  # left arrow
+ *         39: 'RIGHT' # right arrow
+ *   }
  *   # call pocket.getData in a system to use the keyboard
- * 	 pocket.systemForEach 'name', ['player'], (pocket, key, player) ->
- * 	   keyboard = pocket.getData 'keyboard-state'
- * 	   player.shoot()  if keyboard.isNewPress 'SHOOT'
- * 	   player.move(-1) if keyboard.down.LEFT
- * 	   player.move(1)  if keyboard.down.RIGHT
+ *   pocket.systemForEach 'name', ['player'], (pocket, key, player) ->
+ *     keyboard = pocket.getData 'keyboard-state'
+ *     player.shoot()  if keyboard.isNewPress 'SHOOT'
+ *     player.move(-1) if keyboard.down.LEFT
+ *     player.move(1)  if keyboard.down.RIGHT
  *
  * @param  {Object} cmp    component entry
  * @option {String} target CSS selector of target element for keypress events,

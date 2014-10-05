@@ -11,16 +11,16 @@
  * final component values.
  *
  * @example
- * 	 v1 = Vector2.new(10, 20)
- * 	 v2 = {x: 1, y: 2}
+ *   v1 = Vector2.new(10, 20)
+ *   v2 = {x: 1, y: 2}
  *
- * 	 # add in place
- * 	 v3 = Vector2.add(v1, v2)
- * 	 # -> v1 == (11, 22); v3 === v1
+ *   # add in place
+ *   v3 = Vector2.add(v1, v2)
+ *   # -> v1 == (11, 22); v3 === v1
  *
- * 	 # add and clone
- * 	 v4 = Vector2.add(v1, v2, true)
- * 	 # -> v4 == (12, 24); v4 !== v1
+ *   # add and clone
+ *   v4 = Vector2.add(v1, v2, true)
+ *   # -> v4 == (12, 24); v4 !== v1
  *
  * @type {Object}
 ###

@@ -9,8 +9,8 @@
  * - **`height`** - the height of the canvas, in pixels
  * - **`g2d`** - a CanvasRenderingContext2D graphics drawing surface
  * - **`camera`** - a 2D vector representing the location of the 'camera'. the component does not
- * 									actually use this value, but instead provides it in a central place for your
- * 									game to modify and for your rendering systems to use.
+ *                  actually use this value, but instead provides it in a central place for your
+ *                  game to modify and for your rendering systems to use.
  *
  * @example
  *   # require and register the component

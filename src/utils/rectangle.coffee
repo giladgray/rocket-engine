@@ -6,11 +6,11 @@
  * do it yourself too. `Rectangle.new(x, y, width)` will create a square where `width == height`.
  *
  * @example
- * 	 r1 = Rectangle.new(1, 2, 3, 4)
- * 	 r2 = Rectangle.centered(1, 1, 4)
- * 	 r3 = {x: -1, y: -1, width: 4, height: 4}
+ *   r1 = Rectangle.new(1, 2, 3, 4)
+ *   r2 = Rectangle.centered(1, 1, 4)
+ *   r3 = {x: -1, y: -1, width: 4, height: 4}
  *
- * 	 Rectangle.equal(r2, r3)   # -> true
+ *   Rectangle.equal(r2, r3)   # -> true
  *   Rectangle.overlap(r1, r2) # -> true
  *
  * @type {Object}

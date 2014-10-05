@@ -7,9 +7,9 @@ System = require '../system.coffee'
  * to detect collisions or other interactions between keys.
  *
  * @example
- * 	 pocket.system PairSystem.forEach 'a-b', ['letter'], ['number'],
- * 	 	 (pocket, [keyA, letter], [keyB, number]) ->
- * 	 	   # function is called for each pair of [letter key, number key]
+ *   pocket.system PairSystem.forEach 'a-b', ['letter'], ['number'],
+ *     (pocket, [keyA, letter], [keyB, number]) ->
+ *       # function is called for each pair of [letter key, number key]
 ###
 class PairSystem extends System
   constructor: (name, requiredA, requiredB, @actionFn) ->
