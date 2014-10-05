@@ -2,7 +2,8 @@
   "name": "pocket",
   "version": "0.0.0",
   "description": "a little game engine that fits in your pocket",
-  "main": "pocket.js",
+  "main": "src/pocket.coffee",
+  "files": ["src/utils"],
   "scripts": {
     "test": "gulp test"
   },
