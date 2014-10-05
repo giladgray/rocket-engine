@@ -5,7 +5,9 @@ V2 = require '../src/utils/vector.coffee'
 
 describe 'Vector2', ->
   equal = (v1, v2, expected=true) ->
-    expect(V2.equal(v1, v2)).to.equal expected
+    query = expect(v1)
+    query = query.not unless expected
+    query.to.deep.equal v2
 
   describe '#new', ->
     it 'creates a new Vector', ->
@@ -21,6 +23,12 @@ describe 'Vector2', ->
       v2 = V2.clone(v1)
       expect(v1 is v2).to.be.false
       expect(v1).to.deep.equal v2
+
+  describe '#fromPolar', ->
+    it 'creates a new vector with (x,y) describing (r,θ)', ->
+      equal V2.fromPolar(10, 0), V2.new(10, 0)
+      equal V2.fromPolar(10, Math.PI / 2), V2.new(0, 10)
+      equal V2.fromPolar(10, Math.PI), V2.new(-10, 0)
 
   describe '#equal', ->
     it 'determines equality for two vectors', ->

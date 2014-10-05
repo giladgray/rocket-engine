@@ -27,6 +27,9 @@
 module.exports = Vector2 =
   new: (x=0, y=0) -> {x, y}
   clone: (v)  -> {x: v.x, y: v.y}
+  fromPolar: (radius, angle) ->
+    normalize = (num) -> if Math.abs(num) < 1e-10 then 0 else num
+    Vector2.new(normalize(radius * Math.cos(angle)), normalize(radius * Math.sin(angle)))
 
   equal: (v1, v2) -> v1.x is v2.x and v1.y is v2.y
 
