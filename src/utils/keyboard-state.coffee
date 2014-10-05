@@ -39,7 +39,7 @@
  * 	   player.move(-1) if keyboard.down.LEFT
  * 	   player.move(1)  if keyboard.down.RIGHT
  *
- * @param  {Object} cmp    [description]
+ * @param  {Object} cmp    component entry
  * @option {String} target CSS selector of target element for keypress events,
  *         								 or omit to bind to `document`
  * @option {Object} keymap map of keyCodes to string names
