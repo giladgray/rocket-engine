@@ -63,18 +63,16 @@ pocket.systemForEach 'move', ['position', 'velocity'],
 
 ### Custom Systems
 ```coffeescript
-# pocket.system accepts instances of System too. Feel free to
-# abuse the system...
+# pocket.system accepts instances of System too. Feel free to abuse the system...
 Rectangle = require 'pocket/src/utils/rectangle.coffee'
 PairSystem = require 'pocket/src/utils/pair-system.coffee'
 pocket.system PairSystem.forEach 'square-on-square-action',
   ['square', 'position'], ['square', 'position'],
   (pocket, [keyA, squareA, positionA], [keyB, squareB, positionB]) ->
     continue if keyA is keyB
-    rectA = Rectangle.new positionA.x, positionA.y, squareA.size
-    rectB = Rectangle.new positionB.x, positionB.x, squareB.size
-    if Rectangle.overlap(rectA, rectB)
-      pocket.destroyKeys keyA, keyB
+    rectA = Rectangle.new(positionA.x, positionA.y, squareA.size)
+    rectB = Rectangle.new(positionB.x, positionB.y, squareB.size)
+    pocket.destroyKeys(keyA, keyB) if Rectangle.overlap(rectA, rectB)
 ```
 
 ## Meet the Utilities
@@ -86,9 +84,8 @@ remember, and start jamming.
 ### KeyboardState
 A component that stores the current keyboard state and supports a keymap of named keys.
 ```coffeescript
-KeyboardState = require 'pocket/src/utils/keyboard-state.coffee'
 # create a new keyboard using the "Data Component" pattern above
-pocket.component 'keyboard', KeyboardState
+pocket.component 'keyboard', require 'pocket/src/utils/keyboard-state.coffee'
 pocket.key
   keyboard:
     # omg custom key names!!
@@ -106,9 +103,8 @@ pocket.system 'keyboarding', [], (pocket) ->
 ### MouseState
 A component that stores current mouse cursor location and button state.
 ```coffeescript
-MouseState = require 'pocket/src/utils/mouse-state.coffee'
 # create a new mouse using the "Data Component" pattern above
-pocket.component 'mouse', KeyboardState
+pocket.component 'mouse', require 'pocket/src/utils/mouse-state.coffee'
 pocket.key {mouse: null}
 mouse = pocket.getData 'mouse'
 pocket.system 'mouse-master', [], (pocket) ->
@@ -119,9 +115,8 @@ pocket.system 'mouse-master', [], (pocket) ->
 A component that stores a CanvasRenderingContext2D and various useful 2D canvas
 drawing properties.
 ```coffeescript
-Canvas2D = require 'pocket/src/utils/canvas-2d.coffee'
 # create a new mouse using the "Data Component" pattern above
-pocket.component 'canvas', Canvas2D
+pocket.component 'canvas', require 'pocket/src/utils/canvas-2d.coffee'
 pocket.key canvas:
   width: 'auto'
   height: 'auto'
@@ -136,7 +131,7 @@ action function with **two** sets of keys and components. `PairSystem.forEach`
 accepts a function that is invoked for **each pair** of keys. It's like having
 two systems in one!
 
-See `PairSystem` in action in the "Custom Systems" example above.
+See `PairSystem` in action in the ["Custom Systems"](#custom-systems) example above.
 
 ### Vector and Rectangle
 Static classes for manipulating 2D vectors of the form `{x, y}` and Rectangles
@@ -144,7 +139,7 @@ like `{x, y, width, height}`. Vectors and Rectangles are just plain objects so
 they're fast and light. All operations happen through static functions that may
 modify their arguments, like `Vector.add(v1, v2)`.
 
-See `Rectangle` in action in the "Custom Systems" example above.
+See `Rectangle` in action in the ["Custom Systems"](#custom-systems) example above.
 
 ```coffeescript
 # define 2D components trivially
