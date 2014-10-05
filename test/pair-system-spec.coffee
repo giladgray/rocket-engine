@@ -31,8 +31,14 @@ describe 'PairSystem', ->
   it 'should require two reqs arrays', ->
     expect(-> new PairSystem 'bad', ['reqs']).to.throw /two/
 
+  it 'reqs must be arrays', ->
+    expect(-> new PairSystem 'bad', 'times', 'abound').to.throw /array/i
+
   it 'should require action', ->
     expect(-> new PairSystem 'bad', ['reqsA'], ['reqsB']).to.throw /action/
+
+  it 'action must be function', ->
+    expect(-> new PairSystem 'bad', ['reqsA'], ['reqsB'], 'action').to.throw /function/i
 
   it 'system.action should not be the same as actionFn', ->
     actionFn = ->

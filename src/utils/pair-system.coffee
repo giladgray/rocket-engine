@@ -1,4 +1,3 @@
-_ = require 'lodash'
 System = require '../system.coffee'
 
 ###*
@@ -17,8 +16,10 @@ class PairSystem extends System
     # run subclass validation
     super name, requiredA, @action
     # new validation checks for this class
-    throw new Error('PairSystem requires two requiredComponents arrays') unless _.isArray requiredB
-    throw new Error('System requires action Function') unless _.isFunction @actionFn
+    unless Array.isArray requiredB
+      throw new Error('PairSystem requires two requiredComponents arrays')
+    unless typeof @actionFn is 'function'
+      throw new Error('System requires action Function')
     @requiredComponentsB = requiredB
 
   action: (pocket, keysA, reqsA...) ->

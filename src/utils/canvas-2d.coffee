@@ -35,7 +35,7 @@
  * @option {Integer|auto} height height of canvas element, or 'auto' to match window height
  *         											 (default: `'auto'`)
 ###
-module.exports = (cmp, {canvas, width, height}) ->
+Canvas2D = (cmp, {canvas, width, height}) ->
   autoWidth  = width is 'auto'
   autoheight = height is 'auto'
   cmp.canvas = document.querySelector canvas or 'canvas'
@@ -47,3 +47,5 @@ module.exports = (cmp, {canvas, width, height}) ->
     cmp.width  = cmp.canvas.width  = if autoWidth  then document.body.clientWidth  else width
     cmp.height = cmp.canvas.height = if autoheight then document.body.clientHeight else height
   resize()
+
+module.exports = Canvas2D
