@@ -29,7 +29,7 @@ pocket.systemForEach 'move', # friendly name
 
 # 3. add keys that contain components
 pocket.key {
-  spaceship : null # a label*
+  spaceship : true # a label*
   velocity  : null # use default component values
   position  : {x: WIDTH / 2, y: HEIGHT / 2}
 }
@@ -39,22 +39,17 @@ pocket.key {
 ```
 
 ## Advanced Systems Design
+### Data Components
 ```coffeescript
 # singleton data can be stored as a key with a single component
 pocket.component 'config', require './config'
 pocket.key 'config', {config: null}
 # and treated as data rather than a standard key
 config = pocket.getData 'config'
+```
 
-# a system with no dependencies can be used to setup the game
-pocket.system 'inital-badguy-generation', [], (pocket) ->
-  for i in [1..5]
-    pocket.key
-      badguy: true
-      position: randomPosition()
-      health: 10
-      speed: i
-
+### `pocket.systemForEach`
+```coffeescript
 # a system that operates on multiple keys can use systemForEach
 # to reduce boilerplate. turn this:
 pocket.system 'move', ['position', 'velocity'],
@@ -64,10 +59,115 @@ pocket.system 'move', ['position', 'velocity'],
 # into this:
 pocket.systemForEach 'move', ['position', 'velocity'],
   (pocket, key, pos, vel) -> Vector.add pos, vel
+```
 
-# more advanced systems on the way:
-# - input components: keyboard and mouse
-# - graphics systems: Context2D data and rendering components
+### Custom Systems
+```coffeescript
+# pocket.system accepts instances of System too. Feel free to
+# abuse the system...
+Rectangle = require 'pocket/src/utils/rectangle.coffee'
+PairSystem = require 'pocket/src/utils/pair-system.coffee'
+pocket.system PairSystem.forEach 'square-on-square-action',
+  ['square', 'position'], ['square', 'position'],
+  (pocket, [keyA, squareA, positionA], [keyB, squareB, positionB]) ->
+    continue if keyA is keyB
+    rectA = Rectangle.new positionA.x, positionA.y, squareA.size
+    rectB = Rectangle.new positionB.x, positionB.x, squareB.size
+    if Rectangle.overlap(rectA, rectB)
+      pocket.destroyKeys keyA, keyB
+```
+
+## Meet the Utilities
+Pocket comes with a number of utilities components and libraries, which can be
+found in [`src/utils/`](https://github.com/giladgray/pocket/tree/master/src/utils).
+All you need to do is require them, register the component with a name you'll
+remember, and start jamming.
+
+### KeyboardState
+A component that stores the current keyboard state and supports a keymap of named keys.
+```coffeescript
+KeyboardState = require 'pocket/src/utils/keyboard-state.coffee'
+# create a new keyboard using the "Data Component" pattern above
+pocket.component 'keyboard', KeyboardState
+pocket.key
+  keyboard:
+    # omg custom key names!!
+    keymap:
+      W: 'JUMP'
+      S: 'SLIDE'
+      A: 'ROLL_LEFT'
+      D: 'ROLL_RIGHT'
+# sometimes it's easiest to just create a global reference...
+keyboard = pocket.getData 'keyboard'
+pocket.system 'keyboarding', [], (pocket) ->
+  console.log keyboard.down.JUMP
+```
+
+### MouseState
+A component that stores current mouse cursor location and button state.
+```coffeescript
+MouseState = require 'pocket/src/utils/mouse-state.coffee'
+# create a new mouse using the "Data Component" pattern above
+pocket.component 'mouse', KeyboardState
+pocket.key {mouse: null}
+mouse = pocket.getData 'mouse'
+pocket.system 'mouse-master', [], (pocket) ->
+  if mouse.buttons.left then alert('you\'re the mouse master!')
+```
+
+### Canvas2D
+A component that stores a CanvasRenderingContext2D and various useful 2D canvas
+drawing properties.
+```coffeescript
+Canvas2D = require 'pocket/src/utils/canvas-2d.coffee'
+# create a new mouse using the "Data Component" pattern above
+pocket.component 'canvas', Canvas2D
+pocket.key canvas:
+  width: 'auto'
+  height: 'auto'
+canvas = pocket.getData 'canvas'
+pocket.system 'clear-canvas', [], (pocket) ->
+  canvas.g2d.clearRect 0, 0, canvas.width, canvas.height
+```
+
+### PairSystem
+A subclass of System that takes **two** dependency arrays and provides its
+action function with **two** sets of keys and components. `PairSystem.forEach`
+accepts a function that is invoked for **each pair** of keys. It's like having
+two systems in one!
+
+See `PairSystem` in action in the "Custom Systems" example above.
+
+### Vector and Rectangle
+Static classes for manipulating 2D vectors of the form `{x, y}` and Rectangles
+like `{x, y, width, height}`. Vectors and Rectangles are just plain objects so
+they're fast and light. All operations happen through static functions that may
+modify their arguments, like `Vector.add(v1, v2)`.
+
+See `Rectangle` in action in the "Custom Systems" example above.
+
+```coffeescript
+# define 2D components trivially
+Vector = require 'pocket/src/utils/vector.coffee'
+pocket.component 'position', Vector.new()
+pocket.component 'velocity', Vector.new()
+pocket.systemForEach 'move', ['position', 'velocity'],
+  (pocket, key, pos, vel) -> Vector.add pos, vel
+```
+
+### ScoreKeeper
+Keep score in your game and automatically update the high score. Persist your high
+scores across multiple sessions with built-in `localStorage` support. Emits events
+when points are added or a new highscore is set.
+```coffeescript
+ScoreKeeper = require 'pocket/src/utils/score-keeper.coffee'
+keeper = new ScoreKeeper(8) # initial high score
+keeper.on 'score', (total, points) -> alert "#{total} (#{points})"
+keeper.on 'highscore', (record) -> alert "crushed it! #{record}"
+keeper.addScore(4) # -> "4 (4)"
+keeper.addScore(7) # -> "11 (7)", "crushed it! 11"
+keeper.reset()     # -> "0 (-11)"
+keeper.addScore(6) # -> "6 (6)"
 ```
 
 ## Thanks
