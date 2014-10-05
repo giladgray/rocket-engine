@@ -131,7 +131,7 @@ action function with **two** sets of keys and components. `PairSystem.forEach`
 accepts a function that is invoked for **each pair** of keys. It's like having
 two systems in one!
 
-See `PairSystem` in action in the ["Custom Systems"](#custom-systems) example above.
+See `PairSystem` in action in the [Custom Systems](#custom-systems) example above.
 
 ### Vector and Rectangle
 Static classes for manipulating 2D vectors of the form `{x, y}` and Rectangles
@@ -139,11 +139,11 @@ like `{x, y, width, height}`. Vectors and Rectangles are just plain objects so
 they're fast and light. All operations happen through static functions that may
 modify their arguments, like `Vector.add(v1, v2)`.
 
-See `Rectangle` in action in the ["Custom Systems"](#custom-systems) example above.
+See `Rectangle` in action in the [Custom Systems](#custom-systems) example above.
 
 ```coffeescript
-# define 2D components trivially
 Vector = require 'pocket/src/utils/vector.coffee'
+# define 2D components trivially
 pocket.component 'position', Vector.new()
 pocket.component 'velocity', Vector.new()
 pocket.systemForEach 'move', ['position', 'velocity'],
@@ -157,7 +157,7 @@ when points are added or a new highscore is set.
 ```coffeescript
 ScoreKeeper = require 'pocket/src/utils/score-keeper.coffee'
 keeper = new ScoreKeeper
-keeper.enableSaving 'demo-high-score' # loads a high score of 8 from localStorage
+keeper.enableSaving 'demo-high-score' # loads a high score of 8 from localStorag
 keeper.on 'score', (total, points) -> alert "#{total} (#{points})"
 keeper.on 'highscore', (record) -> alert "crushed it! #{record}"
 keeper.addScore(4) # -> "4 (4)"
