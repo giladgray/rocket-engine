@@ -6,9 +6,14 @@
  * To check if a given key is pressed, either look up its keyCode (`event.which`) or its name
  * in the keymap via `cmp.down[keyCode]` or `cmp.down[keyName] isnt 0`.
  *
- * The `keymap` is a map of keyCodes to string names, allowing for dynamic and descriptive bindings,
- * such as `{32: 'SHOOT'}` to name the spacebar 'SHOOT'. When the spacebar is pressed,
- * `cmp.down.SHOOT` will contain the time at which it was pressed.
+ * The `keymap` is a map of keyCodes or key names to string names, allowing for dynamic
+ * and descriptive bindings, such as `{32: 'SHOOT'}` to name the spacebar 'SHOOT'. When
+ * the spacebar is pressed, `cmp.down.SHOOT` will contain the time at which it was pressed. The
+ * keymap also supports single-character key names such as `{W: 'UP', S: 'DOWN'}` and a number of
+ * whole-word key names, which will be converted to their corresponding keyCodes.
+ *
+ * Supported whole-word key names (case sensitive): Alt, Bksp, Backspace, Caps, CapsLock, Ctrl,
+ * Enter, Esc, Escape, Shift, Space, Tab, Up, Left, Down, Right.
  *
  * The component provides a function `isNewPress(keyName, recency=10)` that returns true if the
  * `keyName` was pressed at least `recency` milliseconds ago. Only the first call to `isNewPress`
@@ -39,8 +44,8 @@
  *         								 or omit to bind to `document`
  * @option {Object} keymap map of keyCodes to string names
 ###
-module.exports = (cmp, {target, keymap}) ->
-  keymap ?= {}
+KeyboardState = (cmp, {target, keymap}) ->
+  keymap = KeyboardState.convertKeymap(keymap)
   cmp.target = if typeof target is 'string' then document.querySelector(target) else document.body
   cmp.down = {}
   # returns true if the named key was pressed in the last X milliseconds
@@ -64,3 +69,36 @@ module.exports = (cmp, {target, keymap}) ->
     cmp.down[e.which] = false
     if keyName
       cmp.down[keyName] = 0
+
+# mapping of friendly key names to keyCodes
+KeyboardState.SpecialKeys =
+  Alt    : 18
+  Bksp   : 8
+  Caps   : 20
+  Ctrl   : 17
+  Enter  : 13
+  Esc    : 27
+  Escape : 27
+  Shift  : 16
+  Space  : 32
+  Tab    : 9
+  Backspace : 8
+  CapsLock  : 20
+  Up    : 38
+  Left  : 37
+  Down  : 40
+  Right : 39
+
+# convert a keymap with a mix of keyCodes and keyNames
+KeyboardState.convertKeymap = (keymap = {}) ->
+  for key, name of keymap when not +key
+    delete keymap[key]
+    if key.length is 1
+      keymap[key.charCodeAt(0)] = name
+    else if code = KeyboardState.SpecialKeys[key]
+      keymap[code] = name
+    else
+      throw new Error("KeyboardState: unknown key name '#{key}'")
+  return keymap
+
+module.exports = KeyboardState
