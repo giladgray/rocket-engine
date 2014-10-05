@@ -156,7 +156,8 @@ scores across multiple sessions with built-in `localStorage` support. Emits even
 when points are added or a new highscore is set.
 ```coffeescript
 ScoreKeeper = require 'pocket/src/utils/score-keeper.coffee'
-keeper = new ScoreKeeper(8) # initial high score
+keeper = new ScoreKeeper
+keeper.enableSaving 'demo-high-score' # loads a high score of 8 from localStorage
 keeper.on 'score', (total, points) -> alert "#{total} (#{points})"
 keeper.on 'highscore', (record) -> alert "crushed it! #{record}"
 keeper.addScore(4) # -> "4 (4)"
