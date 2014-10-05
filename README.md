@@ -1,5 +1,4 @@
-Pocket
-======
+# Pocket [![Build Status](https://travis-ci.org/giladgray/pocket.svg?branch=master)](https://travis-ci.org/giladgray/pocket)
 
 > A little game engine that fits in your pocket.
 
