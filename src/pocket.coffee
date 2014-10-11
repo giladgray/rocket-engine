@@ -159,9 +159,20 @@ class Pocket
   ###
   filterKeys: (componentArray...) ->
     names = _.flatten componentArray
-    componentHasKey = (name) => @_components[name]?[id]?
-    # build up comprehension of all keys that pass the 'all components' test
-    return (id for id of @_keys when _.all names, componentHasKey)
+    matching = []
+    # loop through keys of first component table (if exists) to quickly prune number of
+    # keys we have to search. (if they're not in the first table then they'll never work!)
+    table0 = @_components[names.shift()]
+    return matching unless table0
+    # build up list of all keys that pass the 'has all components' test
+    for id of table0
+      hasAll = true
+      for name in names
+        unless @_components[name]?[id]?
+          hasAll = false
+          break
+      matching.push(id) if hasAll
+    return matching
 
   ### SYSTEMS ###
 
