@@ -1,15 +1,17 @@
+_ = require './fn.coffee'
+System = require './system.coffee'
+
 ###
 @author Gilad Gray
 @license MIT
 
+Pocket: A data-driven game engine that fits in your pocket.
+
 Many thanks to kirbysayshi for inspiration and code samples.
 @see https://github.com/kirbysayshi/pocket-ces
 ###
-
-_ = require './fn.coffee'
-System = require './system.coffee'
-
 class Pocket
+  # A reference to {System}.
   @System: System
 
   constructor: ->
@@ -25,10 +27,10 @@ class Pocket
 
   ### KEYS ###
 
-  ###*
-   * Store a new key in the Pocket.
-   * @param  {Object} components mapping of component or label names to initial values
-   * @return {String}            ID of new key
+  ###
+  Store a new key in the Pocket.
+  @param  {Object} components mapping of component or label names to initial values
+  @return {String}            ID of new key
   ###
   key: (components) ->
     # generate a unique ID unless one is given
@@ -45,29 +47,33 @@ class Pocket
 
     return id
 
-  ###*
-   * Convenience method to add a series of keys at once.
-   * @see Pocket::key
-   * @param  {Array<Object>} keys an array or splat of key definitions
-   * @return {Array<String>}      IDs of new keys
+  ###
+  Convenience method to add a series of keys at once.
+  @see Pocket::key
+  @param  {Array<Object>} keys an array or splat of key definitions
+  @return {Array<String>}      IDs of new keys
   ###
   keys: (keys...) ->
     @key(cmps) for cmps in _.flatten(keys)
 
-  ###*
-   * Returns an array of all keys currently in the pocket.
-   * @return {Array<String>} all the keys in the pocket
+  ###
+  Returns an array of all keys currently in the pocket.
+  @return {Array<String>} all the keys in the pocket
   ###
   getKeys: -> Object.keys @_keys
 
+  # Marks given key ID for destruction in the next {Pocket#tick tick}.
+  # @param id [String] key ID to destroy
   destroyKey: (id) -> @_keysToDestroy[id] = true
 
+  # Marks all given key IDs for destruction in the next {Pocket#tick tick}.
+  # @param id [String...] array or splat of key IDs to destroy
   destroyKeys: (ids...) -> @destroyKey(id) for id in _.flatten ids
 
-  ###*
-   * Deletes key entry and all component data about it.
-   * This operation is UNSAFE, prefer using {::destroyKey} which allows the
-   * Pocket to delete keys at its earliest, safe convenience.
+  ###
+  Deletes key entry and all component data about it.
+  This operation is UNSAFE, prefer using {#destroyKey} which allows the
+  Pocket to delete keys at its earliest, safe convenience.
   ###
   immediatelyDestroyKey: (id) ->
     unless @_keys[id]
@@ -78,11 +84,11 @@ class Pocket
 
   ### COMPONENTS ###
 
-  ###*
-   * Register a new named component type in the Pocket.
-   * @param {String} name        name of component
-   * @param {Function, Object} initializer component initializer function
-   *   `(component, options) -> void` or default options object
+  ###
+  Register a new named component type in the Pocket.
+  @param {String} name        name of component
+  @param {Function, Object} initializer component initializer function
+    `(component, options) -> void` or default options object
   ###
   component: (name, initializer) ->
     if _.isFunction initializer
@@ -99,39 +105,46 @@ class Pocket
     @_components[name] = {}
     return
 
-  ###*
-   * Convenience function to define several components at once.
-   * @see Pocket::component
-   * @param  {Object} components mapping of names to initializers
+  ###
+  Convenience function to define several components at once.
+  @see Pocket::component
+  @param  {Object} components mapping of names to initializers
   ###
   components: (components) ->
     @component(name, initializer) for name, initializer of components
     return
 
-  ###*
-   * Returns the state of the given component, for testing only.
-   * @param {String} name component name
-   * @return {Object} component state: mapping of keys to their component values
+  ###
+  Returns the state of the given component, for testing only.
+  @param {String} name component name
+  @return {Object} component state: mapping of keys to their component values
   ###
   getComponent: (name) -> @_components[name]
 
-  ###*
-   * Returns the contents of the first key associated with the component name.
-   * @param {String} name name of component to query for data
+  ###
+  Returns the contents of the first key associated with the component name.
+  @param {String} name name of component to query for data
+  @return {Object} component state for its first key
   ###
   getData: (name) ->
     data = @_components[name]
     return data[Object.keys(data)[0]]
 
+  ###
+  Returns component data for the given key.
+  @param {String} key  key to look up
+  @param {String} name component name
+  @return {Object} component state for the key
+  ###
   dataFor: (key, name) -> @_components[name]?[key]
 
   ### KEYS + COMPONENTS ###
 
-  ###*
-   * Adds a new instance to the given component under the given ID with options
-   * @param {String} id            id of key
-   * @param {String} componentName name of component
-   * @param {Object} options       options for component initializer
+  ###
+  Adds a new instance to the given component under the given ID with options
+  @param {String} id            id of key
+  @param {String} componentName name of component
+  @param {Object} options       options for component initializer
   ###
   addComponentToKey: (id, componentName, options) ->
     unless @_keys[id]
@@ -152,10 +165,10 @@ class Pocket
         console.log "Found no component definition for '#{componentName}', assuming it's a label."
     return
 
-  ###*
-   * Returns an array of keys that contain all the given components.
-   * @param {Array<String>} componentArray array or splat of component names
-   * @return {Array<String>} array of matching key IDs
+  ###
+  Returns an array of keys that contain all the given components.
+  @param componentArray {String...} array or splat of component names
+  @return {Array<String>} array of matching key IDs
   ###
   filterKeys: (componentArray...) ->
     names = _.flatten componentArray
@@ -176,37 +189,45 @@ class Pocket
 
   ### SYSTEMS ###
 
-  ###*
-   * Register a new System in the Pocket.
-   * @param  {String}        name name of the system
-   * @param  {Array<String>} reqs array of required component names
-   * @param  {Function}      fn   system action function, invoked with
-   *                              (pocket, keys[], cName1{}, ..., cNameN{})
+  ###
+  Register a new {System} in the Pocket.
+  @param  {String}        name name of the system
+  @param  {Array<String>} reqs array of required component names
+  @param  {Function}      fn   system action function, invoked with
+                               (pocket, keys[], cName1{}, ..., cNameN{})
+  @return {System} new instance of System that was added.
   ###
   system: (name, reqs, fn) ->
-    @_systems.push if name instanceof System then name else new System(name, reqs, fn)
+    system = if name instanceof System then name else new System(name, reqs, fn)
+    @_systems.push system
+    return system
 
-  ###*
-   * Register a new System in the Pocket that calls its function *for each* key
-   * that matches the requirements, to reduce boilerplate.
-   * @param {String}        name name of the system
-   * @param {Array<String>} reqs array of required component names
-   * @param {Function}      fn   system action function for each key, invoked with
-   *                             (pocket, key, cValue1, ..., cValueN)
+  ###
+  Register a new {System} in the Pocket that calls its function *for each* key
+  that matches the requirements, to reduce boilerplate.
+  @param {String}        name name of the system
+  @param {Array<String>} reqs array of required component names
+  @param {Function}      fn   system action function for each key, invoked with
+                              (pocket, key, cValue1, ..., cValueN)
+  @return {System} new instance of System that was added.
   ###
   systemForEach: (name, reqs, fn) -> @system System.forEach(name, reqs, fn)
 
-  ###*
-   * Internal: Returns array with all system names
+  ###
+  @private
+  Returns array with all system names
+  @return [Array<String>] array with all system names
   ###
   getSystems: -> _.pluck @_systems, 'name'
 
+  # @private
   # delete all keys marked for deletion
   _destroyMarkedKeys: ->
     for key of @_keysToDestroy
       @immediatelyDestroyKey key
       delete @_keysToDestroy[key] # TODO: can this be done in loop?
 
+  # @private
   # run all registered, valid systems
   _runSystems: ->
     for system in @_systems
@@ -217,11 +238,11 @@ class Pocket
       # run the action!
       system.action @, keys, reqs...
 
-  ###*
-   * Perform one tick of the Pocket environment: destroy marked keys and run all systems.
-   * This function is intended to be wrapped in a `requestAnimationFrame` loop so it will
-   * be run every frame.
-   * @param {DOMHighResTimeStamp} time a timestamp from `requestAnimationFrame`
+  ###
+  Perform one tick of the Pocket environment: destroy marked keys and run all systems.
+  This function is intended to be wrapped in a `requestAnimationFrame` loop so it will
+  be run every frame.
+  @param {DOMHighResTimeStamp} time a timestamp from `requestAnimationFrame`
   ###
   tick: (time) ->
     if time?
