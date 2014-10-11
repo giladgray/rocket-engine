@@ -3,7 +3,9 @@
   "version": "0.0.0",
   "description": "a little game engine that fits in your pocket",
   "main": "src/pocket.coffee",
-  "files": ["src/utils"],
+  "files": [
+    "src/utils"
+  ],
   "scripts": {
     "test": "gulp test"
   },
@@ -19,6 +21,7 @@
     "browser-sync": "^1.5.1",
     "browserify": "^5.12.1",
     "chai": "*",
+    "codo": "^2.0.9",
     "coffee-script": "^1.8.0",
     "coffeeify": "^0.7.0",
     "gulp": "^3.8.8",
