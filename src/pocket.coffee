@@ -6,7 +6,7 @@ Many thanks to kirbysayshi for inspiration and code samples.
 @see https://github.com/kirbysayshi/pocket-ces
 ###
 
-_ = require 'lodash'
+_ = require './fn.coffee'
 System = require './system.coffee'
 
 class Pocket
@@ -58,7 +58,7 @@ class Pocket
    * Returns an array of all keys currently in the pocket.
    * @return {Array<String>} all the keys in the pocket
   ###
-  getKeys: -> _.keys @_keys
+  getKeys: -> Object.keys @_keys
 
   destroyKey: (id) -> @_keysToDestroy[id] = true
 
@@ -88,10 +88,11 @@ class Pocket
     if _.isFunction initializer
       # noop
     else if _.isObject initializer
-      compFn = (defaults, comp, options={}) ->
-        _.defaults comp, _.clone(defaults, true)
-        _.assign comp, options
-      initializer = _.partial compFn, initializer
+      defaults = initializer
+      do (defaults) ->
+        initializer = (comp, options={}) ->
+          _.defaults comp, _.clone(defaults, true)
+          _.merge comp, options
     unless _.isFunction initializer
       throw new Error 'Unexpected component initializer type. Must be function or object.'
     @_componentTypes[name] = initializer
@@ -120,7 +121,7 @@ class Pocket
   ###
   getData: (name) ->
     data = @_components[name]
-    return data[_.keys(data)[0]]
+    return data[Object.keys(data)[0]]
 
   dataFor: (key, name) -> @_components[name]?[key]
 

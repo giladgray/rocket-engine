@@ -1,4 +1,4 @@
-_ = require 'lodash'
+_ = require './fn.coffee'
 
 module.exports = class System
   constructor: (@name, @requiredComponents, action) ->
@@ -10,6 +10,6 @@ module.exports = class System
   @forEach: (name, reqs, fn) ->
     action = (pocket, keys, components...) ->
       for key in keys
-        values = components.map (cmp) -> cmp[key]
+        values = _.pluck components, key
         fn(pocket, key, values...)
     return new System name, reqs, action
