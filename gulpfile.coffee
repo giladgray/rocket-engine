@@ -86,6 +86,12 @@ gulp.task 'browserSync', ['build'], ->
     watchOptions:
       debounceDelay: 1000
 
+gulp.task 'docs', ->
+  exec = require('child_process').exec
+  exec 'codo', (err, stdout, stderr) ->
+    console.log stdout
+    console.error stderr
+
 # Watch files, but first launch server
 gulp.task 'watch', ['browserSync'], ->
   # recompile sources

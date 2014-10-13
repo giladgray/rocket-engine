@@ -1,0 +1,10 @@
+--name       "Pocket"
+--readme     README.md
+--title      "Pocket Documentation"
+--private
+--quiet
+--extension  coffee
+--output     ./docs
+./src
+-
+LICENSE
