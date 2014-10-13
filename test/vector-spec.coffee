@@ -72,14 +72,14 @@ describe 'Vector', ->
       expect(Vector.angle(Vector.new(-1, 0))).to.equal Math.PI
       expect(Vector.angle(Vector.new(-1, -1))).to.equal -Math.PI * 3 / 4
 
-  describe '#length', ->
-    it 'returns positive length of vector', ->
+  describe '#dist', ->
+    it 'returns positive distance of vector', ->
       v = Vector.new(10, 0)
-      expect(Vector.length v).to.equal 10
+      expect(Vector.dist v).to.equal 10
       v = Vector.new(0, -10)
-      expect(Vector.length v).to.equal 10
+      expect(Vector.dist v).to.equal 10
       v = Vector.new(-1, 1)
-      expect(Vector.length v).to.equal Math.sqrt(2)
+      expect(Vector.dist v).to.equal Math.sqrt(2)
 
   describe 'clone=true', ->
     v1 = v2 = null
