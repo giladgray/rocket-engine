@@ -1,17 +1,25 @@
 System = require '../system.coffee'
 
-###*
- * A System that accepts two `requiredComponents` arrays and passes both sets of resolved
- * keys and components to its action function. Also support `PairSystem.forEach` to create a
- * system that calls its action function *for each* pair of matching keys. This can be used
- * to detect collisions or other interactions between keys.
- *
- * @example
- *   pocket.system PairSystem.forEach 'a-b', ['letter'], ['number'],
- *     (pocket, [keyA, letter], [keyB, number]) ->
- *       # function is called for each pair of [letter key, number key]
+###
+A System that accepts two `requiredComponents` arrays and passes both sets of resolved
+keys and components to its action function. Also support {PairSystem#forEach} to create a
+system that calls its action function *for each* pair of matching keys. This can be used
+to detect collisions or other interactions between keys.
+
+@example
+  pocket.system PairSystem.forEach 'a-b', ['letter'], ['number'],
+    (pocket, [keyA, letter], [keyB, number]) ->
+      # function is called for each pair of [letter key, number key]
 ###
 class PairSystem extends System
+  ###
+  Create a new PairSystem.
+  @param name [String] name of the System
+  @param requiredA [Array<String>] first array of required component names
+  @param requiredB [Array<String>] second array of required component names
+  @param actionFn  [Function]      pair system action function invoked with
+    `(pocket, [keysA, compA1, ...compAN], [keysB, compB1, ...compBN)`
+  ###
   constructor: (name, requiredA, requiredB, @actionFn) ->
     # run subclass validation
     super name, requiredA, @action
