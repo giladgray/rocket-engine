@@ -35,17 +35,21 @@
       </table>
       <h2>Overview</h2>
       <div class='docstring'>
-  <p>A static Rectangle operations library.</p><p>A rectangle is simply an object with keys <code>{x, y, width, height}</code>.
-<code>Rectangle.new(x, y, width, height)</code> is shorthand for creating this object, but you can easily
-do it yourself too. <code>Rectangle.new(x, y, size)</code> will create a square where <code>width == height</code>.</p><p>All functions on this class are static and the constructor should never be used.</p>
+  <p>A static Rectangle operations library.</p><p>A rectangle is simply an object with keys <code>{left, top, width, height}</code>.
+<code>Rectangle.new(left, top, width, height)</code> is shorthand for creating this object, but you can easily
+do it yourself too. <code>Rectangle.new(left, top, size)</code> will create a square where
+<code>size == width == height</code>.</p><p>All functions on this class are static and the constructor should never be used.</p>
   <div class='examples'>
     <h3>Examples:</h3>
     <h4>
       
     </h4>
-    <pre><code class='coffeescript'>r1 = Rectangle.new(1, 2, 3, 4)
+    <pre><code class='coffeescript'># A classic Rectangle:
+r1 = Rectangle.new(1, 2, 3, 4)
+# A square Rectangle:
 r2 = Rectangle.centered(1, 1, 4)
-r3 = {x: -1, y: -1, width: 4, height: 4}
+# A DIY Rectangle:
+r3 = {left: -1, top: -1, width: 4, height: 4}
 
 Rectangle.equal(r2, r3)   # -&gt; true
 Rectangle.overlap(r1, r2) # -&gt; true</code></pre>
@@ -60,10 +64,11 @@ Rectangle.overlap(r1, r2) # -&gt; true</code></pre>
       <a href='#new-static'>
         .
 (Rectangle)
-<b>new</b><span>(x, y, width, height)</span>
+<b>new</b><span>(left = 0, top = 0, width = 0, height)</span>
       </a>
     </span>
     <span class='desc'>
+      Create a new Rectangle. 
     </span>
   </li>
   <li>
@@ -116,6 +121,18 @@ Rectangle.overlap(r1, r2) # -&gt; true</code></pre>
   </li>
   <li>
     <span class='signature'>
+      <a href='#translate-static'>
+        .
+(Rectangle)
+<b>translate</b><span>(r, v, clone = false)</span>
+      </a>
+    </span>
+    <span class='desc'>
+      Translates a Rectangle&#39;s (left,top) by the given (x,y) coordinates. 
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
       <a href='#overlap-static'>
         .
 (Boolean)
@@ -133,49 +150,36 @@ Rectangle.overlap(r1, r2) # -&gt; true</code></pre>
     <p class='signature' id='new-static'>
       .
 (Rectangle)
-<b>new</b><span>(x, y, width, height)</span>
-      <br>
-      .
-(Rectangle)
-<b>new</b><span>(x, y, size)</span>
+<b>new</b><span>(left = 0, top = 0, width = 0, height)</span>
       <br>
     </p>
-    <div class='tags'>
-  <div class='overloads'>
-    <h3>Overloads:</h3>
-    <div class='overload'>
-      <p class='signature'>
-        .
-(Rectangle)
-<b>new</b><span>(x, y, width, height)</span>
-      </p>
-      <div class='docstring'>
-  <p>Create a new Rectangle. A rectangle is simply an object with keys <code>{x,y,width,height}</code>. This
-method is provided to easily define these objects in a standard way, and to provide square
-shorthand by omitting <code>height</code> parameter.</p>
+    <div class='docstring'>
+  <p>Create a new Rectangle. A rectangle is simply an object with keys <code>{left,top,width,height}</code>.
+This method is provided to easily define these objects and allows a &quot;square&quot; shorthand by
+omitting the <code>height</code> parameter.</p>
 </div>
 <div class='tags'>
   <h3>Parameters:</h3>
   <ul class='param'>
     <li>
-      <span class='name'>x</span>
+      <span class='name'>left</span>
       <span class='type'>
         (
           <tt>Number</tt>
         )
       </span>
       &mdash;
-      <span class='desc'>x coordinate of upper-left corner </span>
+      <span class='desc'>left coordinate of upper-left corner </span>
     </li>
     <li>
-      <span class='name'>y</span>
+      <span class='name'>top</span>
       <span class='type'>
         (
           <tt>Number</tt>
         )
       </span>
       &mdash;
-      <span class='desc'>y coordinate of upper-left corner </span>
+      <span class='desc'>top coordinate of upper-left corner </span>
     </li>
     <li>
       <span class='name'>width</span>
@@ -195,7 +199,7 @@ shorthand by omitting <code>height</code> parameter.</p>
         )
       </span>
       &mdash;
-      <span class='desc'>height of rectangle </span>
+      <span class='desc'>height of rectangle. omit to create a square. </span>
     </li>
   </ul>
   <h3>Returns:</h3>
@@ -209,65 +213,6 @@ shorthand by omitting <code>height</code> parameter.</p>
       <span class='desc'>new rectangle </span>
     </li>
   </ul>
-</div>
-    </div>
-    <div class='overload'>
-      <p class='signature'>
-        .
-(Rectangle)
-<b>new</b><span>(x, y, size)</span>
-      </p>
-      <div class='docstring'>
-  <p>Create a new square Rectangle.</p>
-</div>
-<div class='tags'>
-  <h3>Parameters:</h3>
-  <ul class='param'>
-    <li>
-      <span class='name'>x</span>
-      <span class='type'>
-        (
-          <tt>Number</tt>
-        )
-      </span>
-      &mdash;
-      <span class='desc'>x coordinate of upper-left corner </span>
-    </li>
-    <li>
-      <span class='name'>y</span>
-      <span class='type'>
-        (
-          <tt>Number</tt>
-        )
-      </span>
-      &mdash;
-      <span class='desc'>y coordinate of upper-left corner </span>
-    </li>
-    <li>
-      <span class='name'>size</span>
-      <span class='type'>
-        (
-          <tt>Number</tt>
-        )
-      </span>
-      &mdash;
-      <span class='desc'>width and height of rectangle </span>
-    </li>
-  </ul>
-  <h3>Returns:</h3>
-  <ul class='return'>
-    <li>
-      <span class='type'></span>
-      (
-        <tt><a href='../class/Rectangle.html'>Rectangle</a></tt>
-      )
-      &mdash;
-      <span class='desc'>new square rectangle </span>
-    </li>
-  </ul>
-</div>
-    </div>
-  </div>
 </div>
   </div>
   <div class='method_details'>
@@ -459,6 +404,135 @@ shorthand by omitting <code>height</code> parameter.</p>
 </div>
   </div>
   <div class='method_details'>
+    <p class='signature' id='translate-static'>
+      .
+(Rectangle)
+<b>translate</b><span>(r, v, clone = false)</span>
+      <br>
+    </p>
+    <div class='docstring'>
+  <p>Translates a Rectangle&#39;s (left,top) by the given (x,y) coordinates. Modifies the given
+Rectangle unless <code>clone==true</code>, in which case a new instance is returned with the translated
+components.</p>
+</div>
+<div class='tags'>
+  <h3>Parameters:</h3>
+  <ul class='param'>
+    <li>
+      <span class='name'>r</span>
+      <span class='type'>
+        (
+          <tt><a href='../class/Rectangle.html'>Rectangle</a></tt>
+        )
+      </span>
+      &mdash;
+      <span class='desc'>rectangle </span>
+    </li>
+    <li>
+      <span class='name'>x</span>
+      <span class='type'>
+        (
+          <tt>Number</tt>
+        )
+      </span>
+      &mdash;
+      <span class='desc'>amount to translate <code>r.left</code> </span>
+    </li>
+    <li>
+      <span class='name'>y</span>
+      <span class='type'>
+        (
+          <tt>Number</tt>
+        )
+      </span>
+      &mdash;
+      <span class='desc'>amount to translate <code>r.top</code> </span>
+    </li>
+    <li>
+      <span class='name'>clone</span>
+      <span class='type'>
+        (
+          <tt>Boolean</tt>
+        )
+      </span>
+      &mdash;
+      <span class='desc'>whether to clone the rectangle before modifying components </span>
+    </li>
+  </ul>
+  <h3>Returns:</h3>
+  <ul class='return'>
+    <li>
+      <span class='type'></span>
+      (
+        <tt><a href='../class/Rectangle.html'>Rectangle</a></tt>
+      )
+      &mdash;
+      <span class='desc'>the rectangle, translated </span>
+    </li>
+  </ul>
+  <div class='overloads'>
+    <h3>Overloads:</h3>
+    <div class='overload'>
+      <p class='signature'>
+        .
+(Rectangle)
+<b>translate</b><span>(r, v, clone = false)</span>
+      </p>
+      <div class='docstring'>
+  <p>Translates a Rectangle&#39;s (left,top) by the given Vector. Modifies the given Rectangle unless
+<code>clone==true</code>, in which case a new instance is returned with the translated components.</p>
+</div>
+<div class='tags'>
+  <h3>Parameters:</h3>
+  <ul class='param'>
+    <li>
+      <span class='name'>r</span>
+      <span class='type'>
+        (
+          <tt><a href='../class/Rectangle.html'>Rectangle</a></tt>
+        )
+      </span>
+      &mdash;
+      <span class='desc'>rectangle </span>
+    </li>
+    <li>
+      <span class='name'>v</span>
+      <span class='type'>
+        (
+          <tt><a href='../class/Vector.html'>Vector</a></tt>
+        )
+      </span>
+      &mdash;
+      <span class='desc'>translation vector </span>
+    </li>
+    <li>
+      <span class='name'>clone</span>
+      <span class='type'>
+        (
+          <tt>Boolean</tt>
+        )
+      </span>
+      &mdash;
+      <span class='desc'>whether to clone the rectangle before modifying components </span>
+    </li>
+  </ul>
+  <h3>Returns:</h3>
+  <ul class='return'>
+    <li>
+      <span class='type'></span>
+      (
+        <tt><a href='../class/Rectangle.html'>Rectangle</a></tt>
+      )
+      &mdash;
+      <span class='desc'>the rectangle, translated </span>
+    </li>
+  </ul>
+</div>
+    </div>
+  </div>
+</div>
+  </div>
+  <div class='method_details'>
     <p class='signature' id='overlap-static'>
       .
 (Boolean)
@@ -509,7 +583,7 @@ wholly contained in the other.</p>
 </div>
     </div>
     <div id='footer'>
-  November 23, 14 13:09:49 by
+  November 23, 14 14:02:03 by
   <a href='https://github.com/coffeedoc/codo' title='CoffeeScript API documentation generator'>
     Codo
   </a>
