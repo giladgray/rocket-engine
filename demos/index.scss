@@ -12,14 +12,14 @@ canvas {
 
 pre {
   text-align: left;
-  width: 600px;
+  width: 43em;
   margin: auto;
-  padding: 1.5em 0 1em;
 
-  color: white;
-  background: rgb(30, 30, 30);
-  border: 1px solid black;
-  border-radius: 4px;
+}
+
+.hljs {
+  padding: 1.5em 2em;
+  border-radius: 5px;
 }
 
 kbd {
