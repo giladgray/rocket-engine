@@ -12,14 +12,14 @@ describe 'Rectangle', ->
   describe '#new', ->
     it 'creates a new empty Rectangle', ->
       r = Rectangle.new(1, 2, 3, 4)
-      expect(r).to.deep.equal {x: 1, y: 2, width: 3, height: 4}
+      expect(r).to.deep.equal {left: 1, top: 2, width: 3, height: 4}
 
     it 'create a new square', ->
       r = Rectangle.new(4, 5, 6)
-      expect(r).to.deep.equal {x: 4, y: 5, width: 6, height: 6}
+      expect(r).to.deep.equal {left: 4, top: 5, width: 6, height: 6}
 
     it 'no arguments creates a new empty Rectangle', ->
-      expect(Rectangle.new()).to.deep.equal {x: 0, y: 0, width: 0, height: 0}
+      expect(Rectangle.new()).to.deep.equal {left: 0, top: 0, width: 0, height: 0}
 
   describe '#clone', ->
     it 'creates a new rectangle with same values as argument', ->
