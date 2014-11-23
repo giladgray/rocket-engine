@@ -2,6 +2,7 @@ chai = require 'chai'
 expect = chai.expect
 
 Rectangle = require '../src/utils/rectangle.coffee'
+Vector = require '../src/utils/vector.coffee'
 
 describe 'Rectangle', ->
   equal = (r1, r2, expected=true) ->
@@ -44,6 +45,51 @@ describe 'Rectangle', ->
     it 'returns area of rectangle', ->
       expect(Rectangle.area Rectangle.new(10, 20, 30, 40)).to.equal 30 * 40
       expect(Rectangle.area Rectangle.new(0, 0, 20, 30)).to.equal 20 * 30
+
+  describe '#translate', ->
+    it 'adds (x,y) components to rectangle (top,left)', ->
+      r = Rectangle.new(10, 20, 2, 2)
+      Rectangle.translate(r, 10, 20)
+      expect(r).to.have.property 'left', 20
+      expect(r).to.have.property 'top', 40
+
+    it 'negative component values subtract', ->
+      r = Rectangle.new(10, 20, 2, 2)
+      Rectangle.translate(r, -20, -20)
+      expect(r).to.have.property 'left', -10
+      expect(r).to.have.property 'top', 0
+
+    it 'accepts a Vector instead of two coordinates', ->
+      r = Rectangle.new(10, 20, 2, 2)
+      Rectangle.translate(r, Vector.new(5, -5))
+      expect(r).to.have.property 'left', 15
+      expect(r).to.have.property 'top', 15
+
+    it 'omit coordinates does nothing', ->
+      r = Rectangle.new(1, 1, 1, 1)
+      Rectangle.translate(r)
+      expect(r).to.have.property 'left', 1
+      expect(r).to.have.property 'top', 1
+
+    it 'single coordinate translates left only', ->
+      r = Rectangle.new(1, 1, 1, 1)
+      Rectangle.translate(r, 100)
+      expect(r).to.have.property 'left', 101
+      expect(r).to.have.property 'top', 1
+
+    it 'cloning Rectangle returns a new instance', ->
+      r1 = Rectangle.new(1, 1, 1, 1)
+      r2 = Rectangle.translate(r1, 100, 200, true)
+      expect(r1).to.not.equal r2
+      expect(r2).to.have.property 'left', 101
+      expect(r2).to.have.property 'top', 201
+
+    it 'cloning Rectangle with Vector param returns a new instance', ->
+      r1 = Rectangle.new(1, 1, 1, 1)
+      r2 = Rectangle.translate(r1, Vector.new(100, 200), true)
+      expect(r1).to.not.equal r2
+      expect(r2).to.have.property 'left', 101
+      expect(r2).to.have.property 'top', 201
 
   describe '#overlaps', ->
     rLeft = rRight = rOuter = rGiant = null

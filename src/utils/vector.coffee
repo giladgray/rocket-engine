@@ -23,12 +23,10 @@ All functions on this class are static and the constructor should never be used.
   # add and clone
   v4 = Vector.add(v1, v2, true)
   # -> v4 == (12, 24); v4 !== v1
-
-@type {Object}
 ###
 module.exports = class Vector
   # @nodoc
-  constructor: -> throw new Error('Rectangle: do not use constructor')
+  constructor: -> throw new Error('Vector: static class, do not use constructor')
 
   normalize = (num) -> if Math.abs(num) < 1e-10 then 0 else num
 

@@ -9,8 +9,11 @@ do it yourself too. `Rectangle.new(left, top, size)` will create a square where
 All functions on this class are static and the constructor should never be used.
 
 @example
+  # A classic Rectangle:
   r1 = Rectangle.new(1, 2, 3, 4)
+  # A square Rectangle:
   r2 = Rectangle.centered(1, 1, 4)
+  # A DIY Rectangle:
   r3 = {left: -1, top: -1, width: 4, height: 4}
 
   Rectangle.equal(r2, r3)   # -> true
@@ -18,27 +21,19 @@ All functions on this class are static and the constructor should never be used.
 ###
 module.exports = class Rectangle
   # @nodoc
-  constructor: -> throw new Error('Rectangle: do not use constructor')
+  constructor: -> throw new Error('Rectangle: static class, do not use constructor')
 
   ###
-  @overload .new(left, top, width, height)
-    Create a new Rectangle. A rectangle is simply an object with keys `{left,top,width,height}`.
-    This method is provided to easily define these objects in a standard way, and to provide square
-    shorthand by omitting `height` parameter.
-    @param left   [Number] left coordinate of upper-left corner
-    @param top    [Number] top coordinate of upper-left corner
-    @param width  [Number] width of rectangle
-    @param height [Number] height of rectangle
-    @return [Rectangle] new rectangle
-
-  @overload .new(left, top, size)
-    Create a new square Rectangle.
-    @param left [Number] left coordinate of upper-left corner
-    @param top  [Number] top coordinate of upper-left corner
-    @param size [Number] width and height of rectangle
-    @return [Rectangle] new square rectangle
+  Create a new Rectangle. A rectangle is simply an object with keys `{left,top,width,height}`.
+  This method is provided to easily define these objects and allows a "square" shorthand by
+  omitting the `height` parameter.
+  @param left   [Number] left coordinate of upper-left corner
+  @param top    [Number] top coordinate of upper-left corner
+  @param width  [Number] width of rectangle
+  @param height [Number] height of rectangle. omit to create a square.
+  @return [Rectangle] new rectangle
   ###
-  @new: (left=0, top=0, width=0, height) ->
+  @new: (left = 0, top = 0, width = 0, height) ->
     height ?= width
     {left, top, width, height}
 
@@ -55,7 +50,7 @@ module.exports = class Rectangle
   @param height [Number] height of rectangle
   @return [Rectangle] rectangle centered at (x,y)
   ###
-  @centered: (x=0, y=0, width=0, height) ->
+  @centered: (x = 0, y = 0, width = 0, height) ->
     height ?= width
     Rectangle.new(x - width / 2, y - height / 2, width, height)
 
@@ -70,6 +65,33 @@ module.exports = class Rectangle
   # @param r [Rectangle] rectangle
   # @return [Number] area
   @area: (r) -> r.width * r.height
+
+  ###
+  Translates a Rectangle's (left,top) by the given (x,y) coordinates. Modifies the given
+  Rectangle unless `clone==true`, in which case a new instance is returned with the translated
+  components.
+  @param r [Rectangle] rectangle
+  @param x [Number] amount to translate `r.left`
+  @param y [Number] amount to translate `r.top`
+  @param clone [Boolean] whether to clone the rectangle before modifying components
+  @return [Rectangle] the rectangle, translated
+
+  @overload .translate(r, v, clone = false)
+    Translates a Rectangle's (left,top) by the given Vector. Modifies the given Rectangle unless
+    `clone==true`, in which case a new instance is returned with the translated components.
+    @param r [Rectangle] rectangle
+    @param v [Vector] translation vector
+    @param clone [Boolean] whether to clone the rectangle before modifying components
+    @return [Rectangle] the rectangle, translated
+  ###
+  @translate: (r, x = 0, y = 0, clone = false) ->
+    if typeof x is 'object' and x.x? and x.y?
+      clone = y
+      {x, y} = x
+    if clone then r = Rectangle.clone(r)
+    r.left += x
+    r.top += y
+    return r
 
   # Returns `true` if two rectangles overlap on any side. Also returns `true` if one rectangle is
   # wholly contained in the other.
