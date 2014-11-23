@@ -1,0 +1,778 @@
+<!DOCTYPE html>
+<html>
+  <head>
+  <meta charset='UTF-8'>
+  <title>Pocket Documentation</title>
+  <script src='../javascript/application.js'></script>
+  <script src='../javascript/search.js'></script>
+  <link rel='stylesheet' href='../stylesheets/application.css' type='text/css'>
+</head>
+  <body>
+    <div id='base' data-path='../'></div>
+<div id='header'>
+  <div id='menu'>
+    <a href='../extra/README.md.html' title='Pocket'>
+      Pocket
+    </a>
+    &raquo;
+    <a href='../alphabetical_index.html' title='Index'>
+      Index
+    </a>
+    &raquo;
+    <span class='title'>Vector</span>
+  </div>
+</div>
+    <div id='content'>
+      <h1>
+        Class:
+        Vector
+      </h1>
+      <table class='box'>
+        <tr>
+          <td>Defined in:</td>
+          <td>src&#47;utils&#47;vector.coffee</td>
+        </tr>
+      </table>
+      <h2>Overview</h2>
+      <div class='docstring'>
+  <p>A static 2-dimensional Vector operations library.</p><p>A vector is simply a regular object with keys <code>{x, y}</code>. <code>Vector.new(x, y)</code> is shorthand for creating
+this object, but you can easily do it yourself too.</p><p>All vector operations operate on one or two vectors. <code>equal</code>, <code>angle</code>, <code>distSq</code>, and <code>dist</code>
+return scalar values and leave the vector unchanged. <code>add</code>, <code>sub</code>, <code>scale</code>, and <code>invert</code> will
+by default mutate the components of the first vector argument and return it. if the final <code>clone</code>
+argument is set to <code>true</code> on these operations then they will return a <em>new</em> vector object with
+final component values.</p><p>All functions on this class are static and the constructor should never be used.</p><p>@type {Object}</p>
+  <div class='examples'>
+    <h3>Examples:</h3>
+    <h4>
+      
+    </h4>
+    <pre><code class='coffeescript'>v1 = Vector.new(10, 20)
+v2 = {x: 1, y: 2}
+
+# add in place
+v3 = Vector.add(v1, v2)
+# -&gt; v1 == (11, 22); v3 === v1
+
+# add and clone
+v4 = Vector.add(v1, v2, true)
+# -&gt; v4 == (12, 24); v4 !== v1</code></pre>
+  </div>
+</div>
+<div class='tags'>
+</div>
+      <h2>Class Method Summary</h2>
+      <ul class='summary'>
+  <li>
+    <span class='signature'>
+      <a href='#new-static'>
+        .
+(void)
+<b>new</b><span>(x = 0, y = 0)</span>
+      </a>
+    </span>
+    <span class='desc'>
+      Create a new Vector. 
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#fromPolar-static'>
+        .
+(Vector)
+<b>fromPolar</b><span>(radius, angle)</span>
+      </a>
+    </span>
+    <span class='desc'>
+      Create a new Vector from polar coordinates <code>(r,θ)</code>. 
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#clone-static'>
+        .
+(Vector)
+<b>clone</b><span>(v)</span>
+      </a>
+    </span>
+    <span class='desc'>
+      Clone a Vector object. 
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#equal-static'>
+        .
+(Boolean)
+<b>equal</b><span>(v1, v2)</span>
+      </a>
+    </span>
+    <span class='desc'>
+      Returns true if two vectors have the same coordinates. 
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#add-static'>
+        .
+(Vector)
+<b>add</b><span>(v1, v2, clone = false)</span>
+      </a>
+    </span>
+    <span class='desc'>
+      Adds two vectors, modifiying the first one and returning the resulting vector. 
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#sub-static'>
+        .
+(Vector)
+<b>sub</b><span>(v1, v2, clone = false)</span>
+      </a>
+    </span>
+    <span class='desc'>
+      Subtracts two vectors, modifiying the first one and returning the resulting vector. 
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#scale-static'>
+        .
+(Vector)
+<b>scale</b><span>(v, factor, clone = false)</span>
+      </a>
+    </span>
+    <span class='desc'>
+      Scales a vector by the given factor, modifiying it and returning the resulting vector. 
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#invert-static'>
+        .
+(Vector)
+<b>invert</b><span>(v, clone = false)</span>
+      </a>
+    </span>
+    <span class='desc'>
+      Scales a vector by -1 so it points in the opposite direction, modifiying it and returning the resulting vector.
+
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#angle-static'>
+        .
+(Number)
+<b>angle</b><span>(v)</span>
+      </a>
+    </span>
+    <span class='desc'>
+      Returns the angle represented by this vector. 
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#distSq-static'>
+        .
+(Number)
+<b>distSq</b><span>(v)</span>
+      </a>
+    </span>
+    <span class='desc'>
+      Returns the square of the distance (or length) represented by this vector. 
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#dist-static'>
+        .
+(Number)
+<b>dist</b><span>(v)</span>
+      </a>
+    </span>
+    <span class='desc'>
+      Returns the distance (or length) represented by this vector. 
+    </span>
+  </li>
+</ul>
+      <h2>Class Method Details</h2>
+      <div class='methods'>
+  <div class='method_details'>
+    <p class='signature' id='new-static'>
+      .
+(void)
+<b>new</b><span>(x = 0, y = 0)</span>
+      <br>
+    </p>
+    <div class='docstring'>
+  <p>Create a new Vector. A vector is simply an object with keys <code>{x,y}</code>. This method is provided
+as shorthand and allows for default and optional parameters.</p>
+</div>
+<div class='tags'>
+  <h3>Parameters:</h3>
+  <ul class='param'>
+    <li>
+      <span class='name'>x</span>
+      <span class='type'>
+        (
+          <tt>Number</tt>
+        )
+      </span>
+      &mdash;
+      <span class='desc'>x coordinate of vector </span>
+    </li>
+    <li>
+      <span class='name'>y</span>
+      <span class='type'>
+        (
+          <tt>Number</tt>
+        )
+      </span>
+      &mdash;
+      <span class='desc'>y coordinate of vector </span>
+    </li>
+  </ul>
+</div>
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='fromPolar-static'>
+      .
+(Vector)
+<b>fromPolar</b><span>(radius, angle)</span>
+      <br>
+    </p>
+    <div class='docstring'>
+  <p>Create a new Vector from polar coordinates <code>(r,θ)</code>.</p>
+</div>
+<div class='tags'>
+  <h3>Parameters:</h3>
+  <ul class='param'>
+    <li>
+      <span class='name'>radius</span>
+      <span class='type'>
+        (
+          <tt>Number</tt>
+        )
+      </span>
+      &mdash;
+      <span class='desc'>polar radius </span>
+    </li>
+    <li>
+      <span class='name'>angle</span>
+      <span class='type'>
+        (
+          <tt>Number</tt>
+        )
+      </span>
+      &mdash;
+      <span class='desc'>polar angle in radians </span>
+    </li>
+  </ul>
+  <h3>Returns:</h3>
+  <ul class='return'>
+    <li>
+      <span class='type'></span>
+      (
+        <tt><a href='../class/Vector.html'>Vector</a></tt>
+      )
+      &mdash;
+      <span class='desc'>new vector with <code>{x,y}</code> coordinates. </span>
+    </li>
+  </ul>
+</div>
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='clone-static'>
+      .
+(Vector)
+<b>clone</b><span>(v)</span>
+      <br>
+    </p>
+    <div class='docstring'>
+  <p>Clone a Vector object.</p>
+</div>
+<div class='tags'>
+  <h3>Parameters:</h3>
+  <ul class='param'>
+    <li>
+      <span class='name'>v</span>
+      <span class='type'>
+        (
+          <tt><a href='../class/Vector.html'>Vector</a></tt>
+        )
+      </span>
+      &mdash;
+      <span class='desc'>vector </span>
+    </li>
+  </ul>
+  <h3>Returns:</h3>
+  <ul class='return'>
+    <li>
+      <span class='type'></span>
+      (
+        <tt><a href='../class/Vector.html'>Vector</a></tt>
+      )
+      &mdash;
+      <span class='desc'>cloned vector </span>
+    </li>
+  </ul>
+</div>
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='equal-static'>
+      .
+(Boolean)
+<b>equal</b><span>(v1, v2)</span>
+      <br>
+    </p>
+    <div class='docstring'>
+  <p>Returns true if two vectors have the same coordinates.</p>
+</div>
+<div class='tags'>
+  <h3>Parameters:</h3>
+  <ul class='param'>
+    <li>
+      <span class='name'>v1</span>
+      <span class='type'>
+        (
+          <tt><a href='../class/Vector.html'>Vector</a></tt>
+        )
+      </span>
+      &mdash;
+      <span class='desc'>first vector </span>
+    </li>
+    <li>
+      <span class='name'>v2</span>
+      <span class='type'>
+        (
+          <tt><a href='../class/Vector.html'>Vector</a></tt>
+        )
+      </span>
+      &mdash;
+      <span class='desc'>second vector </span>
+    </li>
+  </ul>
+  <h3>Returns:</h3>
+  <ul class='return'>
+    <li>
+      <span class='type'></span>
+      (
+        <tt>Boolean</tt>
+      )
+      &mdash;
+      <span class='desc'><code>true</code> if both vectors have the same coordinates </span>
+    </li>
+  </ul>
+</div>
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='add-static'>
+      .
+(Vector)
+<b>add</b><span>(v1, v2, clone = false)</span>
+      <br>
+    </p>
+    <div class='docstring'>
+  <p>Adds two vectors, modifiying the first one and returning the resulting vector.  If <code>clone=true</code>
+then <code>v1</code> is first cloned and this new Vector with the added components is returned.</p>
+</div>
+<div class='tags'>
+  <h3>Parameters:</h3>
+  <ul class='param'>
+    <li>
+      <span class='name'>v1</span>
+      <span class='type'>
+        (
+          <tt><a href='../class/Vector.html'>Vector</a></tt>
+        )
+      </span>
+      &mdash;
+      <span class='desc'>first vector </span>
+    </li>
+    <li>
+      <span class='name'>v2</span>
+      <span class='type'>
+        (
+          <tt><a href='../class/Vector.html'>Vector</a></tt>
+        )
+      </span>
+      &mdash;
+      <span class='desc'>second vector </span>
+    </li>
+    <li>
+      <span class='name'>clone</span>
+      <span class='type'>
+        (
+          <tt>Boolean</tt>
+        )
+      </span>
+      &mdash;
+      <span class='desc'>whether to clone the first vector before modifying components </span>
+    </li>
+  </ul>
+  <h3>Returns:</h3>
+  <ul class='return'>
+    <li>
+      <span class='type'></span>
+      (
+        <tt><a href='../class/Vector.html'>Vector</a></tt>
+      )
+      &mdash;
+      <span class='desc'>vector with added components </span>
+    </li>
+  </ul>
+</div>
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='sub-static'>
+      .
+(Vector)
+<b>sub</b><span>(v1, v2, clone = false)</span>
+      <br>
+    </p>
+    <div class='docstring'>
+  <p>Subtracts two vectors, modifiying the first one and returning the resulting vector.  If
+<code>clone=true</code> then <code>v1</code> is first cloned and this new Vector with the subtracted components is
+returned.</p>
+</div>
+<div class='tags'>
+  <h3>Parameters:</h3>
+  <ul class='param'>
+    <li>
+      <span class='name'>v1</span>
+      <span class='type'>
+        (
+          <tt><a href='../class/Vector.html'>Vector</a></tt>
+        )
+      </span>
+      &mdash;
+      <span class='desc'>first vector </span>
+    </li>
+    <li>
+      <span class='name'>v2</span>
+      <span class='type'>
+        (
+          <tt><a href='../class/Vector.html'>Vector</a></tt>
+        )
+      </span>
+      &mdash;
+      <span class='desc'>second vector </span>
+    </li>
+    <li>
+      <span class='name'>clone</span>
+      <span class='type'>
+        (
+          <tt>Boolean</tt>
+        )
+      </span>
+      &mdash;
+      <span class='desc'>whether to clone the first vector before modifying components </span>
+    </li>
+  </ul>
+  <h3>Returns:</h3>
+  <ul class='return'>
+    <li>
+      <span class='type'></span>
+      (
+        <tt><a href='../class/Vector.html'>Vector</a></tt>
+      )
+      &mdash;
+      <span class='desc'>vector with subtracted components </span>
+    </li>
+  </ul>
+</div>
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='scale-static'>
+      .
+(Vector)
+<b>scale</b><span>(v, factor, clone = false)</span>
+      <br>
+    </p>
+    <div class='docstring'>
+  <p>Scales a vector by the given factor, modifiying it and returning the resulting vector.  If
+<code>clone=true</code> then <code>v</code> is first cloned and this new Vector with the scaled components is returned.</p>
+</div>
+<div class='tags'>
+  <h3>Parameters:</h3>
+  <ul class='param'>
+    <li>
+      <span class='name'>v</span>
+      <span class='type'>
+        (
+          <tt><a href='../class/Vector.html'>Vector</a></tt>
+        )
+      </span>
+      &mdash;
+      <span class='desc'>vector </span>
+    </li>
+    <li>
+      <span class='name'>factor</span>
+      <span class='type'>
+        (
+          <tt>Number</tt>
+        )
+      </span>
+      &mdash;
+      <span class='desc'>amount to scale each component by </span>
+    </li>
+    <li>
+      <span class='name'>clone</span>
+      <span class='type'>
+        (
+          <tt>Boolean</tt>
+        )
+      </span>
+      &mdash;
+      <span class='desc'>whether to clone the first vector before modifying components </span>
+    </li>
+  </ul>
+  <h3>Returns:</h3>
+  <ul class='return'>
+    <li>
+      <span class='type'></span>
+      (
+        <tt><a href='../class/Vector.html'>Vector</a></tt>
+      )
+      &mdash;
+      <span class='desc'>vector with scaled components </span>
+    </li>
+  </ul>
+</div>
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='invert-static'>
+      .
+(Vector)
+<b>invert</b><span>(v, clone = false)</span>
+      <br>
+    </p>
+    <div class='docstring'>
+  <p>Scales a vector by -1 so it points in the opposite direction, modifiying it and returning the
+resulting vector.  If <code>clone=true</code> then <code>v</code> is first cloned and this new Vector with the inverted
+components is returned.</p>
+</div>
+<div class='tags'>
+  <h3>Parameters:</h3>
+  <ul class='param'>
+    <li>
+      <span class='name'>v</span>
+      <span class='type'>
+        (
+          <tt><a href='../class/Vector.html'>Vector</a></tt>
+        )
+      </span>
+      &mdash;
+      <span class='desc'>vector </span>
+    </li>
+    <li>
+      <span class='name'>clone</span>
+      <span class='type'>
+        (
+          <tt>Boolean</tt>
+        )
+      </span>
+      &mdash;
+      <span class='desc'>whether to clone the first vector before modifying components </span>
+    </li>
+  </ul>
+  <h3>Returns:</h3>
+  <ul class='return'>
+    <li>
+      <span class='type'></span>
+      (
+        <tt><a href='../class/Vector.html'>Vector</a></tt>
+      )
+      &mdash;
+      <span class='desc'>vector with inverted components </span>
+    </li>
+  </ul>
+</div>
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='angle-static'>
+      .
+(Number)
+<b>angle</b><span>(v)</span>
+      <br>
+    </p>
+    <div class='docstring'>
+  <p>Returns the angle represented by this vector.</p>
+</div>
+<div class='tags'>
+  <h3>Parameters:</h3>
+  <ul class='param'>
+    <li>
+      <span class='name'>v</span>
+      <span class='type'>
+        (
+          <tt><a href='../class/Vector.html'>Vector</a></tt>
+        )
+      </span>
+      &mdash;
+      <span class='desc'>vector </span>
+    </li>
+  </ul>
+  <h3>Returns:</h3>
+  <ul class='return'>
+    <li>
+      <span class='type'></span>
+      (
+        <tt>Number</tt>
+      )
+      &mdash;
+      <span class='desc'>angle </span>
+    </li>
+  </ul>
+</div>
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='distSq-static'>
+      .
+(Number)
+<b>distSq</b><span>(v)</span>
+      <br>
+    </p>
+    <div class='docstring'>
+  <p>Returns the square of the distance (or length) represented by this vector.</p>
+</div>
+<div class='tags'>
+  <h3>Parameters:</h3>
+  <ul class='param'>
+    <li>
+      <span class='name'>v</span>
+      <span class='type'>
+        (
+          <tt><a href='../class/Vector.html'>Vector</a></tt>
+        )
+      </span>
+      &mdash;
+      <span class='desc'>vector </span>
+    </li>
+  </ul>
+  <h3>Returns:</h3>
+  <ul class='return'>
+    <li>
+      <span class='type'></span>
+      (
+        <tt>Number</tt>
+      )
+      &mdash;
+      <span class='desc'>square of distance </span>
+    </li>
+  </ul>
+</div>
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='dist-static'>
+      .
+(Number)
+<b>dist</b><span>(v)</span>
+      <br>
+    </p>
+    <div class='docstring'>
+  <p>Returns the distance (or length) represented by this vector.</p>
+</div>
+<div class='tags'>
+  <h3>Parameters:</h3>
+  <ul class='param'>
+    <li>
+      <span class='name'>v</span>
+      <span class='type'>
+        (
+          <tt><a href='../class/Vector.html'>Vector</a></tt>
+        )
+      </span>
+      &mdash;
+      <span class='desc'>vector </span>
+    </li>
+  </ul>
+  <h3>Returns:</h3>
+  <ul class='return'>
+    <li>
+      <span class='type'></span>
+      (
+        <tt>Number</tt>
+      )
+      &mdash;
+      <span class='desc'>distance </span>
+    </li>
+  </ul>
+</div>
+  </div>
+</div>
+    </div>
+    <div id='footer'>
+  November 23, 14 13:09:49 by
+  <a href='https://github.com/coffeedoc/codo' title='CoffeeScript API documentation generator'>
+    Codo
+  </a>
+  2.0.9
+  &#10034;
+  Press H to see the keyboard shortcuts
+  &#10034;
+  <a href='http://twitter.com/netzpirat' target='_parent'>@netzpirat</a>
+  &#10034;
+  <a href='http://twitter.com/_inossidabile' target='_parent'>@_inossidabile</a>
+</div>
+<iframe id='search_frame'></iframe>
+<div id='fuzzySearch'>
+  <input type='text'>
+  <ol></ol>
+</div>
+<div id='help'>
+  <p>
+    Quickly fuzzy find classes, mixins, methods, file:
+  </p>
+  <ul>
+    <li>
+      <span>T</span>
+      Open fuzzy finder dialog
+    </li>
+  </ul>
+  <p>
+    Control the navigation frame:
+  </p>
+  <ul>
+    <li>
+      <span>L</span>
+      Toggle list view
+    </li>
+    <li>
+      <span>C</span>
+      Show class list
+    </li>
+    <li>
+      <span>I</span>
+      Show mixin list
+    </li>
+    <li>
+      <span>F</span>
+      Show file list
+    </li>
+    <li>
+      <span>M</span>
+      Show method list
+    </li>
+    <li>
+      <span>E</span>
+      Show extras list
+    </li>
+  </ul>
+  <p>
+    You can focus and blur the search input:
+  </p>
+  <ul>
+    <li>
+      <span>S</span>
+      Focus search input
+    </li>
+    <li>
+      <span>Esc</span>
+      Blur search input
+    </li>
+  </ul>
+</div>
+  </body>
+</html>

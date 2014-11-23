@@ -10,13 +10,12 @@ canvas {
 
 pre {
   text-align: left;
-  width: 600px;
-  margin: auto;
-  padding: 1.5em 0 1em;
-  color: white;
-  background: #1e1e1e;
-  border: 1px solid black;
-  border-radius: 4px; }
+  width: 43em;
+  margin: auto; }
+
+.hljs {
+  padding: 1.5em 2em;
+  border-radius: 5px; }
 
 kbd {
   background: #eee;
@@ -53,3 +52,14 @@ a {
     float: left; }
   .demo-header .view-source {
     float: right; }
+
+.scores {
+  position: absolute;
+  left: 50%;
+  width: 4em;
+  margin-left: -2em;
+  text-align: center;
+  font-size: 3em; }
+  .scores .best {
+    font-size: 0.5em;
+    color: #666; }

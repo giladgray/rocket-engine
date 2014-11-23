@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html>
+  <head>
+  <meta charset='UTF-8'>
+  <title>Pocket Documentation</title>
+  <script src='../javascript/application.js'></script>
+  <script src='../javascript/search.js'></script>
+  <link rel='stylesheet' href='../stylesheets/application.css' type='text/css'>
+</head>
+  <body>
+    <div id='base' data-path='../'></div>
+<div id='header'>
+  <div id='menu'>
+    <a href='../extra/README.md.html' title='Pocket'>
+      Pocket
+    </a>
+    &raquo;
+    <a href='../alphabetical_index.html' title='Index'>
+      Index
+    </a>
+    &raquo;
+    <span class='title'>README.md</span>
+  </div>
+</div>
+    <div id='content'>
+      <nav class='toc'>
+        <p class='title'>
+          <a class='hide_toc' href='#'>
+            <strong>Table of Contents</strong>
+          </a>
+          <small>
+            (<a class='float_toc' href='#'>left</a>)
+          </small>
+        </p>
+      </nav>
+      <div id='filecontents'>
+        <h1 id="pocket-build-status-https-travis-ci-org-giladgray-pocket-svg-branch-master-https-travis-ci-org-giladgray-pocket-">Pocket <a href="https://travis-ci.org/giladgray/pocket"><img src="https://travis-ci.org/giladgray/pocket.svg?branch=master" alt="Build Status"></a></h1>
+<blockquote><p>A little game engine that fits in your pocket.</p></blockquote>
+<h2 id="development">Development</h2>
+<ol>
+<li><code>npm install</code></li>
+<li><code>gulp watch</code> to lint and test :coffee:</li>
+</ol>
+<h2 id="usage">Usage</h2>
+<pre><code class="lang-coffeescript">Pocket = require &#39;pocket&#39;
+
+pocket = new Pocket
+
+# 1. define components as functions that assign values...
+pocket.component &#39;position&#39;, (cmp, options) -&gt;
+  cmp = {x: options.x ? 0, y: options.y ? 0}
+# ...or as default value objects
+pocket.component &#39;velocity&#39;, {x: 0, y: 0}
+
+# 2. define systems that operate on keys with specific components
+pocket.systemForEach &#39;move&#39;, # friendly name
+  # required components for a key
+  [&#39;position&#39;, &#39;velocity&#39;],
+  # function to call for each key that has all components
+  (pocket, key, position, velocity) -&gt;
+    position.x += velocity.x
+    position.y += velocity.y
+
+# 3. add keys that contain components
+pocket.key {
+  spaceship : true # a label*
+  velocity  : null # use default component values
+  position  : {x: WIDTH / 2, y: HEIGHT / 2}
+}
+
+# * a label is simply a component without a definition,
+# used to tag keys for easy discovery.
+</code></pre>
+<h2 id="advanced-systems-design">Advanced Systems Design</h2>
+<h3 id="data-components">Data Components</h3>
+<pre><code class="lang-coffeescript"># singleton data can be stored as a key with a single component
+pocket.component &#39;config&#39;, require &#39;./config&#39;
+pocket.key &#39;config&#39;, {config: null}
+# and treated as data rather than a standard key
+config = pocket.getData &#39;config&#39;
+</code></pre>
+<h3 id="-pocket-systemforeach-"><code>pocket.systemForEach</code></h3>
+<pre><code class="lang-coffeescript"># a system that operates on multiple keys can use systemForEach
+# to reduce boilerplate. turn this:
+pocket.system &#39;move&#39;, [&#39;position&#39;, &#39;velocity&#39;],
+  (pocket, keys, position, velocity) -&gt;
+    for key in keys
+      Vector.add position[key], velocity[key]
+# into this:
+pocket.systemForEach &#39;move&#39;, [&#39;position&#39;, &#39;velocity&#39;],
+  (pocket, key, pos, vel) -&gt; Vector.add pos, vel
+</code></pre>
+<h3 id="custom-systems">Custom Systems</h3>
+<pre><code class="lang-coffeescript"># pocket.system accepts instances of System too. Feel free to abuse the system...
+Rectangle = require &#39;pocket/src/utils/rectangle.coffee&#39;
+PairSystem = require &#39;pocket/src/utils/pair-system.coffee&#39;
+pocket.system PairSystem.forEach &#39;square-on-square-action&#39;,
+  [&#39;square&#39;, &#39;position&#39;], [&#39;square&#39;, &#39;position&#39;],
+  (pocket, [keyA, squareA, positionA], [keyB, squareB, positionB]) -&gt;
+    continue if keyA is keyB
+    rectA = Rectangle.new(positionA.x, positionA.y, squareA.size)
+    rectB = Rectangle.new(positionB.x, positionB.y, squareB.size)
+    pocket.destroyKeys(keyA, keyB) if Rectangle.overlap(rectA, rectB)
+</code></pre>
+<h2 id="meet-the-utilities">Meet the Utilities</h2><p>Pocket comes with a number of utilities components and libraries, which can be
+found in <a href="https://github.com/giladgray/pocket/tree/master/src/utils"><code>src/utils/</code></a>.
+All you need to do is require them, register the component with a name you&#39;ll
+remember, and start jamming.</p><h3 id="keyboardstate">KeyboardState</h3><p>A component that stores the current keyboard state and supports a keymap of named keys.</p><pre><code class="lang-coffeescript"># create a new keyboard using the &quot;Data Component&quot; pattern above
+pocket.component &#39;keyboard&#39;, require &#39;pocket/src/utils/keyboard-state.coffee&#39;
+pocket.key
+  keyboard:
+    # omg custom key names!!
+    keymap:
+      W: &#39;JUMP&#39;
+      S: &#39;SLIDE&#39;
+      A: &#39;ROLL_LEFT&#39;
+      D: &#39;ROLL_RIGHT&#39;
+# sometimes it&#39;s easiest to just create a global reference...
+keyboard = pocket.getData &#39;keyboard&#39;
+pocket.system &#39;keyboarding&#39;, [], (pocket) -&gt;
+  console.log keyboard.down.JUMP
+</code></pre>
+<h3 id="mousestate">MouseState</h3><p>A component that stores current mouse cursor location and button state.</p><pre><code class="lang-coffeescript"># create a new mouse using the &quot;Data Component&quot; pattern above
+pocket.component &#39;mouse&#39;, require &#39;pocket/src/utils/mouse-state.coffee&#39;
+pocket.key {mouse: null}
+mouse = pocket.getData &#39;mouse&#39;
+pocket.system &#39;mouse-master&#39;, [], (pocket) -&gt;
+  if mouse.buttons.left then alert(&#39;you\&#39;re the mouse master!&#39;)
+</code></pre>
+<h3 id="canvas2d">Canvas2D</h3><p>A component that stores a CanvasRenderingContext2D and various useful 2D canvas
+drawing properties.</p><pre><code class="lang-coffeescript"># create a new mouse using the &quot;Data Component&quot; pattern above
+pocket.component &#39;canvas&#39;, require &#39;pocket/src/utils/canvas-2d.coffee&#39;
+pocket.key canvas:
+  width: &#39;auto&#39;
+  height: &#39;auto&#39;
+canvas = pocket.getData &#39;canvas&#39;
+pocket.system &#39;clear-canvas&#39;, [], (pocket) -&gt;
+  canvas.g2d.clearRect 0, 0, canvas.width, canvas.height
+</code></pre>
+<h3 id="pairsystem">PairSystem</h3><p>A subclass of System that takes <strong>two</strong> dependency arrays and provides its
+action function with <strong>two</strong> sets of keys and components. <code>PairSystem.forEach</code>
+accepts a function that is invoked for <strong>each pair</strong> of keys. It&#39;s like having
+two systems in one!</p><p>See <code>PairSystem</code> in action in the <a href="#custom-systems">Custom Systems</a> example above.</p><h3 id="vector-and-rectangle">Vector and Rectangle</h3><p>Static classes for manipulating 2D vectors of the form <code>{x, y}</code> and Rectangles
+like <code>{x, y, width, height}</code>. Vectors and Rectangles are just plain objects so
+they&#39;re fast and light. All operations happen through static functions that may
+modify their arguments, like <code>Vector.add(v1, v2)</code>.</p><p>See <code>Rectangle</code> in action in the <a href="#custom-systems">Custom Systems</a> example above.</p><pre><code class="lang-coffeescript">Vector = require &#39;pocket/src/utils/vector.coffee&#39;
+# define 2D components trivially
+pocket.component &#39;position&#39;, Vector.new()
+pocket.component &#39;velocity&#39;, Vector.new()
+pocket.systemForEach &#39;move&#39;, [&#39;position&#39;, &#39;velocity&#39;],
+  (pocket, key, pos, vel) -&gt; Vector.add pos, vel
+</code></pre>
+<h3 id="scorekeeper">ScoreKeeper</h3><p>Keep score in your game and automatically update the high score. Persist your high
+scores across multiple sessions with built-in <code>localStorage</code> support. Emits events
+when points are added or a new highscore is set.</p><pre><code class="lang-coffeescript">ScoreKeeper = require &#39;pocket/src/utils/score-keeper.coffee&#39;
+keeper = new ScoreKeeper
+keeper.enableSaving &#39;demo-high-score&#39; # loads a high score of 8 from localStorag
+keeper.on &#39;score&#39;, (total, points) -&gt; alert &quot;#{total} (#{points})&quot;
+keeper.on &#39;highscore&#39;, (record) -&gt; alert &quot;crushed it! #{record}&quot;
+keeper.addScore(4) # -&gt; &quot;4 (4)&quot;
+keeper.addScore(7) # -&gt; &quot;11 (7)&quot;, &quot;crushed it! 11&quot;
+keeper.reset()     # -&gt; &quot;0 (-11)&quot;
+keeper.addScore(6) # -&gt; &quot;6 (6)&quot;
+</code></pre>
+<h2 id="thanks">Thanks</h2><p>My deepest thanks go to Drew Petersen (@kirbysayshi) for his presentation
+<a href="http://2014.jsconf.eu/speakers/#/speakers/drew-petersen-developing-games-using-data-not-trees">Developing Games Using Data not Trees</a>
+at JSConf EU 2014, and for his code at <a href="https://github.com/kirbysayshi/pocket-ces">kirbysayshi/pocket-ces</a>.</p><h2 id="license">License</h2><p>MIT</p>
+      </div>
+    </div>
+    <div id='footer'>
+  November 23, 14 13:09:49 by
+  <a href='https://github.com/coffeedoc/codo' title='CoffeeScript API documentation generator'>
+    Codo
+  </a>
+  2.0.9
+  &#10034;
+  Press H to see the keyboard shortcuts
+  &#10034;
+  <a href='http://twitter.com/netzpirat' target='_parent'>@netzpirat</a>
+  &#10034;
+  <a href='http://twitter.com/_inossidabile' target='_parent'>@_inossidabile</a>
+</div>
+<iframe id='search_frame'></iframe>
+<div id='fuzzySearch'>
+  <input type='text'>
+  <ol></ol>
+</div>
+<div id='help'>
+  <p>
+    Quickly fuzzy find classes, mixins, methods, file:
+  </p>
+  <ul>
+    <li>
+      <span>T</span>
+      Open fuzzy finder dialog
+    </li>
+  </ul>
+  <p>
+    Control the navigation frame:
+  </p>
+  <ul>
+    <li>
+      <span>L</span>
+      Toggle list view
+    </li>
+    <li>
+      <span>C</span>
+      Show class list
+    </li>
+    <li>
+      <span>I</span>
+      Show mixin list
+    </li>
+    <li>
+      <span>F</span>
+      Show file list
+    </li>
+    <li>
+      <span>M</span>
+      Show method list
+    </li>
+    <li>
+      <span>E</span>
+      Show extras list
+    </li>
+  </ul>
+  <p>
+    You can focus and blur the search input:
+  </p>
+  <ul>
+    <li>
+      <span>S</span>
+      Focus search input
+    </li>
+    <li>
+      <span>Esc</span>
+      Blur search input
+    </li>
+  </ul>
+</div>
+  </body>
+</html>

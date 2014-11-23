@@ -1,0 +1,19 @@
+<html>
+  <head>
+    <title>Tests</title>
+    <link rel="stylesheet" href="mocha.css">
+  </head>
+  <body>
+    <div id="mocha"><p><a href=".">Index</a></p></div>
+    <div id="messages"></div>
+    <div id="fixtures"></div>
+    <script src="mocha.js" charset="utf-8"></script>
+    <script charset="utf-8">
+      mocha.setup('bdd')
+    </script>
+    <script src="tests.js" charset="utf-8"></script>
+    <script charset="utf-8">
+      mocha.run()
+    </script>
+  </body>
+</html>
