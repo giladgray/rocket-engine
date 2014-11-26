@@ -12,10 +12,10 @@ updateCount = (delta) ->
   else numBalls = 0
   countElem.textContent = numBalls
 
-pocket = new Pocket
+rocket = new Rocket
 
 # context-2d component for storing CanvasRenderingContext2D and other canvas info
-pocket.component 'context-2d', (cmp, {canvas}) ->
+rocket.component 'context-2d', (cmp, {canvas}) ->
   cmp.canvas = document.querySelector canvas or '#canvas'
   cmp.g2d = cmp.canvas.getContext('2d')
   cmp.center = {x: 0, y: 0}
@@ -31,10 +31,10 @@ pocket.component 'context-2d', (cmp, {canvas}) ->
   resize()
 
 # the context-2d data object
-pocket.key {'context-2d': null}
+rocket.key {'context-2d': null}
 
 # maintain keyboard state. this guy mutates himself, it's prety badass
-pocket.component 'keyboard-state', (cmp, {target, keymap}) ->
+rocket.component 'keyboard-state', (cmp, {target, keymap}) ->
   cmp.target = target or document
   cmp.down = {}
   # returns true if the named key was pressed in the last X milliseconds
@@ -57,7 +57,7 @@ pocket.component 'keyboard-state', (cmp, {target, keymap}) ->
       cmp.down[keyName] = 0
 
 # the keyboard-state data object
-pocket.key
+rocket.key
   'input': null
   'keyboard-state':
     keymap:
@@ -65,17 +65,17 @@ pocket.key
       32: 'DESTROY'
 
 # keyboard commands
-pocket.systemForEach 'input-balls', ['keyboard-state'], (pocket, key, keyboard) ->
+rocket.systemForEach 'input-balls', ['keyboard-state'], (rocket, key, keyboard) ->
   if keyboard.isNewPress 'DESTROY'
-    pocket.destroyKeys pocket.filterKeys('ball')
+    rocket.destroyKeys rocket.filterKeys('ball')
     updateCount(0)
   if keyboard.isNewPress 'ADD'
     randomBall()
 
 # ball components
-pocket.component 'position', {x: 0, y: 0}
-pocket.component 'velocity', {x: 0, y: 0}
-pocket.component 'circle',   {radius: 30, color: 'red'}
+rocket.component 'position', {x: 0, y: 0}
+rocket.component 'velocity', {x: 0, y: 0}
+rocket.component 'circle',   {radius: 30, color: 'red'}
 
 # cycle through colors
 colors = ['seagreen', 'navy', 'indigo', 'firebrick', 'goldenrod']
@@ -88,9 +88,9 @@ nextColor = ->
 # make a ball with random attributes
 randomBall = ->
   updateCount(1)
-  {width, height} = pocket.getData 'context-2d'
+  {width, height} = rocket.getData 'context-2d'
   radius = random(20, 100)
-  pocket.key {
+  rocket.key {
     ball: true
     position :
       x: random(radius, width - radius)
@@ -106,22 +106,22 @@ randomBall() for i in [0...5]
 
 # apply gravity to every thing with a velocity
 GRAVITY = 0.5
-pocket.systemForEach 'gravity', ['velocity'], (pocket, key, vel) ->
+rocket.systemForEach 'gravity', ['velocity'], (rocket, key, vel) ->
   vel.y += GRAVITY
 
 # move each ball
-pocket.systemForEach 'move', ['position', 'velocity'], (pocket, key, pos, vel) ->
+rocket.systemForEach 'move', ['position', 'velocity'], (rocket, key, pos, vel) ->
   pos.x += vel.x
   pos.y += vel.y
 
 # clear the canvas each frame
-pocket.system 'clear-canvas', [], (pocket) ->
-  {g2d, width, height} = pocket.getData 'context-2d'
+rocket.system 'clear-canvas', [], (rocket) ->
+  {g2d, width, height} = rocket.getData 'context-2d'
   g2d.clearRect 0, 0, width, height
 
 # draw each balls
-pocket.systemForEach 'draw-ball', ['position', 'circle'], (pocket, key, pos, circle) ->
-  {g2d} = pocket.getData 'context-2d'
+rocket.systemForEach 'draw-ball', ['position', 'circle'], (rocket, key, pos, circle) ->
+  {g2d} = rocket.getData 'context-2d'
   g2d.beginPath()
   g2d.fillStyle = circle.color
   g2d.arc pos.x, pos.y, circle.radius, 0, Math.PI * 2
@@ -129,7 +129,7 @@ pocket.systemForEach 'draw-ball', ['position', 'circle'], (pocket, key, pos, cir
   g2d.fill()
 
 # bounce each ball when they reach the edge of the canvas
-pocket.systemForEach 'bounce', ['position', 'velocity', 'circle'], (pkt, key, pos, vel, {radius}) ->
+rocket.systemForEach 'bounce', ['position', 'velocity', 'circle'], (pkt, key, pos, vel, {radius}) ->
   {width, height} = pkt.getData 'context-2d'
   if pos.x < radius or pos.x > width - radius
     vel.x *= -1
@@ -140,7 +140,7 @@ pocket.systemForEach 'bounce', ['position', 'velocity', 'circle'], (pkt, key, po
 
 # render loop
 start = (time) ->
-  pocket.tick(time)
+  rocket.tick(time)
   window.requestAnimationFrame start
 
 document.addEventListener 'DOMContentLoaded', -> start()
