@@ -6,18 +6,18 @@ return unless document?
 
 document.body.appendChild document.createElement('canvas')
 
-Pocket = require '../../src/pocket.coffee'
+Rocket = require '../../src/rocket.coffee'
 Canvas2D = require '../../src/utils/canvas-2d.coffee'
 
 describe 'Canvas2D', ->
-  pocket = null
+  rocket = null
   canvas = null
 
   makeCanvas = (options = null) ->
-    pocket = new Pocket
-    pocket.component 'canvas-2d', Canvas2D
-    pocket.key {'canvas-2d': options}
-    canvas = pocket.getData 'canvas-2d'
+    rocket = new Rocket
+    rocket.component 'canvas-2d', Canvas2D
+    rocket.key {'canvas-2d': options}
+    canvas = rocket.getData 'canvas-2d'
     return canvas
 
   beforeEach ->

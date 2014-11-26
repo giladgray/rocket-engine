@@ -14,16 +14,16 @@ A `canvas-2d` component defines several keys:
 
 @example
   # require and register the component
-  pocket.component 'canvas-2d', require('pocket/utils/canvas-2d.coffee')
+  rocket.component 'canvas-2d', require('rocket-engine/utils/canvas-2d.coffee')
   # define a key with the canvas-2d component and your options
-  pocket.key {
+  rocket.key {
   	'canvas-2d':
       canvas: '#game'
       width : 'auto'
       height: 600
   }
-  # use pocket.getData in a system to get the component data and draw some graphics!
-  pocket.systemForEach 'draw-squares', ['position', 'square'], (p, k, {x, y}, {size, color}) ->
+  # use rocket.getData in a system to get the component data and draw some graphics!
+  rocket.systemForEach 'draw-squares', ['position', 'square'], (p, k, {x, y}, {size, color}) ->
   	{g2d} = p.getData 'canvas-2d'
   	g2d.fillStyle = color
   	g2d.fillRect x, y, size, size
@@ -41,6 +41,13 @@ Canvas2D = (cmp, {canvas, width, height}) ->
   cmp.canvas = document.querySelector canvas or 'canvas'
   cmp.g2d = cmp.canvas.getContext('2d')
   cmp.camera = {x: 0, y: 0}
+
+  cmp.pointShape = (points) ->
+    for pt, i in points
+      if i is 0
+        cmp.g2d.moveTo pt.x, pt.y
+      else cmp.g2d.lineTo pt.x, pt.y
+    cmp.g2d.lineTo points[0].x, points[0].y
 
   # ensure canvas is as large as possible
   window.addEventListener 'resize', resize = ->

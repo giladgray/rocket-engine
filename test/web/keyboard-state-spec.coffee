@@ -4,18 +4,18 @@ expect = chai.expect
 # THIS TEST ONLY WORKS IN THE BROWSER
 return unless document?
 
-Pocket = require '../../src/pocket.coffee'
+Rocket = require '../../src/rocket.coffee'
 Keyboard = require '../../src/utils/keyboard-state.coffee'
 
 describe 'KeyboardState', ->
-  pocket = null
+  rocket = null
   keyboard = null
 
   makeKeyboard = (options = null) ->
-    pocket = new Pocket
-    pocket.component 'keyboard-state', Keyboard
-    pocket.key {'keyboard-state': options}
-    keyboard = pocket.getData 'keyboard-state'
+    rocket = new Rocket
+    rocket.component 'keyboard-state', Keyboard
+    rocket.key {'keyboard-state': options}
+    keyboard = rocket.getData 'keyboard-state'
     return keyboard
 
   triggerKeyEvent = (type, key) ->
