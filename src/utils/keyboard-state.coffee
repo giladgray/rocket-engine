@@ -22,9 +22,9 @@ check that the key is pressed `if cmp.down[keyName] isnt 0`.
 
 @example
   # register the keyboard-state component
-  pocket.component 'keyboard-state', require('pocket/utils/keyboard-state.coffee')
+  rocket.component 'keyboard-state', require('rocket-engine/utils/keyboard-state.coffee')
   # define a key with keymap for your game
-  pocket.key {
+  rocket.key {
     'keyboard-state':
       keymap:
         27: 'MENU'  # esc
@@ -32,9 +32,9 @@ check that the key is pressed `if cmp.down[keyName] isnt 0`.
         37: 'LEFT'  # left arrow
         39: 'RIGHT' # right arrow
   }
-  # call pocket.getData in a system to use the keyboard
-  pocket.systemForEach 'name', ['player'], (pocket, key, player) ->
-    keyboard = pocket.getData 'keyboard-state'
+  # call rocket.getData in a system to use the keyboard
+  rocket.systemForEach 'name', ['player'], (rocket, key, player) ->
+    keyboard = rocket.getData 'keyboard-state'
     player.shoot()  if keyboard.isNewPress 'SHOOT'
     player.move(-1) if keyboard.down.LEFT
     player.move(1)  if keyboard.down.RIGHT

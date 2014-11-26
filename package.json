@@ -1,8 +1,8 @@
 {
-  "name": "pocket",
+  "name": "rocket-engine",
   "version": "0.0.0",
-  "description": "a little game engine that fits in your pocket",
-  "main": "src/pocket.coffee",
+  "description": "a little game engine that'll take you over the moon",
+  "main": "src/rocket.coffee",
   "files": [
     "src/utils"
   ],
@@ -13,7 +13,7 @@
     "transform": [
       "coffeeify"
     ],
-    "standalone": "Pocket"
+    "standalone": "Rocket"
   },
   "author": "Gilad Gray <giladgray@gmail.com>",
   "license": "MIT",

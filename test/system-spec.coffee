@@ -25,6 +25,6 @@ describe 'System', ->
     it 'should create an action function that calls the given function for each key', ->
       keys = ['one', 'two', 'three']
       fnKeys = []
-      sys = System.forEach 'name', [], (pocket, key) -> fnKeys.push key
+      sys = System.forEach 'name', [], (rocket, key) -> fnKeys.push key
       sys.action null, keys
       expect(fnKeys).to.deep.equal keys

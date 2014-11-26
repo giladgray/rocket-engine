@@ -13,10 +13,10 @@ rectangle = (rect1...) ->
       yOverlap = false
     return xOverlap and yOverlap
 
-pocket = new Pocket
+rocket = new Rocket
 
 # context-2d component for storing CanvasRenderingContext2D and other canvas info
-pocket.component 'context-2d', (cmp, {canvas}) ->
+rocket.component 'context-2d', (cmp, {canvas}) ->
   cmp.canvas = document.querySelector canvas or '#canvas'
   cmp.g2d = cmp.canvas.getContext('2d')
   cmp.center = {x: 0, y: 0}
@@ -30,10 +30,10 @@ pocket.component 'context-2d', (cmp, {canvas}) ->
   resize()
 
 # the context-2d data object
-pocket.key {'context-2d': null}
+rocket.key {'context-2d': null}
 
 # maintain keyboard state. this guy mutates himself, it's prety badass
-pocket.component 'keyboard-state', (cmp, {target, keymap}) ->
+rocket.component 'keyboard-state', (cmp, {target, keymap}) ->
   cmp.target = target or document
   cmp.down = {}
   # returns true if the named key was pressed in the last X milliseconds
@@ -59,7 +59,7 @@ pocket.component 'keyboard-state', (cmp, {target, keymap}) ->
       cmp.down[keyName] = 0
 
 # the keyboard-state data object
-pocket.key
+rocket.key
   'input': null
   'keyboard-state':
     keymap:
@@ -68,7 +68,7 @@ pocket.key
 
 
 # constants
-ctx = pocket.getData 'context-2d'
+ctx = rocket.getData 'context-2d'
 ctx.center = {x: ctx.width / 2, y: ctx.height / 2}
 
 GRAVITY = 0.4
@@ -76,12 +76,12 @@ BARRIER_DISTANCE = ctx.height * 3 / 4
 BARRIER_WIDTH = 200
 
 # game components
-pocket.component 'position', {x: 0, y: 0}
-pocket.component 'velocity', {x: 0, y: 0}
-pocket.component 'square',   {size: 30, color: 'cornflowerblue', angle: 0}
-pocket.component 'barrier',  {height: 50, gapWidth: BARRIER_WIDTH, x: 0, y: 0, color: 'cornflowerblue'}
+rocket.component 'position', {x: 0, y: 0}
+rocket.component 'velocity', {x: 0, y: 0}
+rocket.component 'square',   {size: 30, color: 'cornflowerblue', angle: 0}
+rocket.component 'barrier',  {height: 50, gapWidth: BARRIER_WIDTH, x: 0, y: 0, color: 'cornflowerblue'}
 
-pocket.player = pocket.key
+rocket.player = rocket.key
   amazing: true
   square: {color: 'black', angle: Math.PI / 4, size: 20}
   position: {x: ctx.center.x, y: ctx.center.y + ctx.height / 4}
@@ -92,14 +92,14 @@ lastBarrierX = ctx.center.x
 addLevel = ->
   barrier = {x: ctx.center.x + random(-150, 150), y: 100 - BARRIER_DISTANCE * level++}
   squareX = (barrier.x + lastBarrierX) / 2 + BARRIER_WIDTH / 2
-  pocket.key {evil: true, barrier}
-  pocket.key
+  rocket.key {evil: true, barrier}
+  rocket.key
     evil: true
     square: null
     position:
       x: squareX + random(-BARRIER_WIDTH / 2, BARRIER_WIDTH / 2)
       y: barrier.y - BARRIER_DISTANCE * 2 / 3
-  pocket.key
+  rocket.key
     evil: true
     square: null
     position:
@@ -119,9 +119,9 @@ scoreZero = ->
     highscoreEl.textContent = bestScore = score
   scoreEl.textContent = score = 0
 
-pocket.system 'level-barrier', ['barrier', 'evil'], (pocket, keys, barriers) ->
-  pPos = pocket.dataFor pocket.player, 'position'
-  pSq  = pocket.dataFor pocket.player, 'square'
+rocket.system 'level-barrier', ['barrier', 'evil'], (rocket, keys, barriers) ->
+  pPos = rocket.dataFor rocket.player, 'position'
+  pSq  = rocket.dataFor rocket.player, 'square'
   playerRect = rectangle(pPos.x, pPos.y + ctx.width / 3, pSq.size, pSq.size)
   for key in keys
     barrier = barriers[key]
@@ -135,9 +135,9 @@ pocket.system 'level-barrier', ['barrier', 'evil'], (pocket, keys, barriers) ->
       scoreOne()
     if barrier.marked is false then scoreZero()
 
-pocket.system 'square-smash', ['position', 'square', 'evil'], (pocket, keys, positions, squares) ->
-  pPos = pocket.dataFor pocket.player, 'position'
-  pSq  = pocket.dataFor pocket.player, 'square'
+rocket.system 'square-smash', ['position', 'square', 'evil'], (rocket, keys, positions, squares) ->
+  pPos = rocket.dataFor rocket.player, 'position'
+  pSq  = rocket.dataFor rocket.player, 'square'
   playerRect = rectangle(pPos.x, pPos.y + ctx.width / 3, pSq.size, pSq.size)
   for key in keys
     position = positions[key]
@@ -150,8 +150,8 @@ pocket.system 'square-smash', ['position', 'square', 'evil'], (pocket, keys, pos
 
 # keyboard commands
 MOVE = {x: 2, y: 12}
-pocket.systemForEach 'input-brick', ['velocity', 'amazing'], (pocket, key, velocity) ->
-  keyboard = pocket.getData 'keyboard-state'
+rocket.systemForEach 'input-brick', ['velocity', 'amazing'], (rocket, key, velocity) ->
+  keyboard = rocket.getData 'keyboard-state'
   jump = 0
   if keyboard.isNewPress 'LEFT'
     jump = -MOVE.x
@@ -162,31 +162,31 @@ pocket.systemForEach 'input-brick', ['velocity', 'amazing'], (pocket, key, veloc
     velocity.y = MOVE.y
 
 # apply gravity
-pocket.systemForEach 'gravity', ['velocity'], (pocket, key, vel) ->
+rocket.systemForEach 'gravity', ['velocity'], (rocket, key, vel) ->
   vel.y -= GRAVITY
 
 # move each ball
-pocket.systemForEach 'move', ['position', 'velocity'], (pocket, key, pos, vel) ->
+rocket.systemForEach 'move', ['position', 'velocity'], (rocket, key, pos, vel) ->
   pos.x += vel.x
   pos.y -= vel.y
   ctx.center.y = Math.min(ctx.center.y, pos.y)
 
 # move barriers and evil squares ahead once you pass them so they'll get reused
-pocket.systemForEach 'destroy-barrier', ['barrier', 'evil'], (pocket, key, barrier) ->
+rocket.systemForEach 'destroy-barrier', ['barrier', 'evil'], (rocket, key, barrier) ->
   if barrier.y - BARRIER_DISTANCE * 2 > ctx.center.y
-    pocket.destroyKey key
+    rocket.destroyKey key
     addLevel()
-pocket.systemForEach 'destroy-square', ['position', 'evil'], (pocket, key, pos) ->
+rocket.systemForEach 'destroy-square', ['position', 'evil'], (rocket, key, pos) ->
   if pos.y - BARRIER_DISTANCE * 2 > ctx.center.y
-    pocket.destroyKey key
+    rocket.destroyKey key
 
 # clear the canvas each frame
-pocket.system 'clear-canvas', [], (pocket) ->
+rocket.system 'clear-canvas', [], (rocket) ->
   ctx.g2d.clearRect 0, 0, ctx.width, ctx.height
 
 # draw each square
-pocket.systemForEach 'draw-square', ['position', 'square'], (pocket, key, pos, square) ->
-  isAmazing = pocket.dataFor(key, 'amazing')
+rocket.systemForEach 'draw-square', ['position', 'square'], (rocket, key, pos, square) ->
+  isAmazing = rocket.dataFor(key, 'amazing')
   {g2d, center, width} = ctx
   g2d.save()
   g2d.beginPath()
@@ -198,7 +198,7 @@ pocket.systemForEach 'draw-square', ['position', 'square'], (pocket, key, pos, s
   g2d.fill()
   g2d.restore()
 
-pocket.systemForEach 'draw-barrier', ['barrier'], (pocket, key, barrier) ->
+rocket.systemForEach 'draw-barrier', ['barrier'], (rocket, key, barrier) ->
   {g2d, width, center} = ctx
   g2d.save()
   g2d.beginPath()
@@ -212,7 +212,7 @@ pocket.systemForEach 'draw-barrier', ['barrier'], (pocket, key, barrier) ->
 
 # render loop
 start = (time) ->
-  pocket.tick(time)
+  rocket.tick(time)
   window.requestAnimationFrame start
 
 document.addEventListener 'DOMContentLoaded', -> start()

@@ -9,10 +9,10 @@ distance = (a, b) ->
   dy = a.y - b.y
   Math.sqrt(dx * dx + dy * dy)
 
-pocket = new Pocket
+rocket = new Rocket
 
 # context-2d component for storing CanvasRenderingContext2D and other canvas info
-pocket.component 'context-2d', (cmp, {canvas}) ->
+rocket.component 'context-2d', (cmp, {canvas}) ->
   cmp.canvas = document.querySelector canvas or '#canvas'
   cmp.g2d = cmp.canvas.getContext('2d')
   cmp.center = {x: 0, y: 0}
@@ -26,13 +26,13 @@ pocket.component 'context-2d', (cmp, {canvas}) ->
   resize()
 
 # the context-2d data object
-pocket.key
+rocket.key
   'context-2d':
     width: 'auto'
     height: 'auto'
-canvas = pocket.getData 'context-2d'
+canvas = rocket.getData 'context-2d'
 
-pocket.component 'mouse-state', (cmp, {target, origin}) ->
+rocket.component 'mouse-state', (cmp, {target, origin}) ->
   # point to which mouse coordinates are relative
   origin ?= {}
   cmp.origin = {x: origin.x ? 0, y: origin.y ? 0}
@@ -69,21 +69,21 @@ pocket.component 'mouse-state', (cmp, {target, origin}) ->
   cmp.target.addEventListener 'mouseenter', (e) -> cmp.inWindow = true
   cmp.target.addEventListener 'mouseleave', (e) -> cmp.inWindow = false
 
-pocket.key
+rocket.key
   'mouse-state': null
-mouse = pocket.getData 'mouse-state'
+mouse = rocket.getData 'mouse-state'
 
 # game components
-pocket.component 'position', {x: 0, y: 0}
-pocket.component 'velocity', {x: 0, y: 0}
-pocket.component 'circle',   {radius: 30, color: 'cornflowerblue'}
+rocket.component 'position', {x: 0, y: 0}
+rocket.component 'velocity', {x: 0, y: 0}
+rocket.component 'circle',   {radius: 30, color: 'cornflowerblue'}
 
 MAX_FUEL  = 5000
 mouseFuel = 0
 
 newBall = ->
   mouseFuel = MAX_FUEL
-  pocket.key
+  rocket.key
     position:
       x: random canvas.width
       y: random canvas.height
@@ -92,7 +92,7 @@ newBall = ->
     circle: null
 newBall()
 
-pocket.systemForEach 'move-ball', ['position', 'velocity'], (pocket, key, pos, vel) ->
+rocket.systemForEach 'move-ball', ['position', 'velocity'], (rocket, key, pos, vel) ->
   return unless mouse.inWindow
   angle = Math.atan2 mouse.cursor.y - pos.y, mouse.cursor.x - pos.x
   vel.x = vel.speed * Math.cos(angle)
@@ -100,27 +100,27 @@ pocket.systemForEach 'move-ball', ['position', 'velocity'], (pocket, key, pos, v
   if mouse.buttons.left and mouseFuel > 0 
     vel.x *= -1 / 4
     vel.y *= -1 / 4
-    mouseFuel -= pocket.delta
+    mouseFuel -= rocket.delta
   else
     vel.speed += 1 / 20
-    mouseFuel += pocket.delta / 3
+    mouseFuel += rocket.delta / 3
     mouseFuel = Math.min(mouseFuel, MAX_FUEL)
   pos.x += vel.x
   pos.y += vel.y
 
-pocket.systemForEach 'respawn-ball', ['position', 'circle'], (pocket, key, pos, {radius}) ->
+rocket.systemForEach 'respawn-ball', ['position', 'circle'], (rocket, key, pos, {radius}) ->
   if distance(mouse.cursor, pos) < radius
-    pocket.destroyKey key
+    rocket.destroyKey key
     scoreZero()
     newBall()
 
 # clear the canvas each frame
-pocket.system 'clear-canvas', [], (pocket) ->
+rocket.system 'clear-canvas', [], (rocket) ->
   {g2d, width, height} = canvas
   g2d.clearRect 0, 0, width, height
 
 # draw each balls
-pocket.systemForEach 'draw-ball', ['position', 'circle'], (pocket, key, pos, circle) ->
+rocket.systemForEach 'draw-ball', ['position', 'circle'], (rocket, key, pos, circle) ->
   {g2d} = canvas
   g2d.beginPath()
   g2d.fillStyle = circle.color
@@ -129,7 +129,7 @@ pocket.systemForEach 'draw-ball', ['position', 'circle'], (pocket, key, pos, cir
   g2d.fill()
 
 # draw each balls
-pocket.system 'draw-fuel', [], (pocket) ->
+rocket.system 'draw-fuel', [], (rocket) ->
   {g2d, width, height} = canvas
   g2d.beginPath()
   g2d.fillStyle = 'orange'
@@ -147,13 +147,13 @@ scoreZero = ->
     highscoreEl.textContent = bestScore = score
   scoreEl.textContent = score = 0
 
-pocket.system 'update-score', [], (pocket) ->
+rocket.system 'update-score', [], (rocket) ->
   return unless mouse.inWindow
-  scoreOne Math.floor(pocket.delta or 0)
+  scoreOne Math.floor(rocket.delta or 0)
 
 # render loop
 start = (time) ->
-  pocket.tick(time)
+  rocket.tick(time)
   window.requestAnimationFrame start
 
 document.addEventListener 'DOMContentLoaded', -> start()

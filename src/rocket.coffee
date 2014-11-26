@@ -5,12 +5,12 @@ System = require './system.coffee'
 @author Gilad Gray
 @license MIT
 
-Pocket: A data-driven game engine that fits in your pocket.
+Rocket Engine: A data-driven game engine that'll take you over the moon.
 
 Many thanks to kirbysayshi for inspiration and code samples.
 @see https://github.com/kirbysayshi/pocket-ces
 ###
-class Pocket
+class RocketEngine
   # A reference to {System}.
   @System: System
 
@@ -28,7 +28,7 @@ class Pocket
   ### KEYS ###
 
   ###
-  Store a new key in the Pocket.
+  Store a new key in the Rocket.
   @param  {Object} components mapping of component or label names to initial values
   @return {String}            ID of new key
   ###
@@ -49,7 +49,7 @@ class Pocket
 
   ###
   Convenience method to add a series of keys at once.
-  @see Pocket::key
+  @see RocketEngine::key
   @param  {Array<Object>} keys an array or splat of key definitions
   @return {Array<String>}      IDs of new keys
   ###
@@ -57,23 +57,23 @@ class Pocket
     @key(cmps) for cmps in _.flatten(keys)
 
   ###
-  Returns an array of all keys currently in the pocket.
-  @return {Array<String>} all the keys in the pocket
+  Returns an array of all existing keys.
+  @return {Array<String>} all existing keys
   ###
   getKeys: -> Object.keys @_keys
 
-  # Marks given key ID for destruction in the next {Pocket#tick tick}.
+  # Marks given key ID for destruction in the next {Rocket#tick tick}.
   # @param id [String] key ID to destroy
   destroyKey: (id) -> @_keysToDestroy[id] = true
 
-  # Marks all given key IDs for destruction in the next {Pocket#tick tick}.
+  # Marks all given key IDs for destruction in the next {Rocket#tick tick}.
   # @param id [String...] array or splat of key IDs to destroy
   destroyKeys: (ids...) -> @destroyKey(id) for id in _.flatten ids
 
   ###
   Deletes key entry and all component data about it.
   This operation is UNSAFE, prefer using {#destroyKey} which allows the
-  Pocket to delete keys at its earliest, safe convenience.
+  Rocket to delete keys at its earliest, safe convenience.
   ###
   immediatelyDestroyKey: (id) ->
     unless @_keys[id]
@@ -85,7 +85,7 @@ class Pocket
   ### COMPONENTS ###
 
   ###
-  Register a new named component type in the Pocket.
+  Register a new named component type in the Rocket.
   @param {String} name        name of component
   @param {Function, Object} initializer component initializer function
     `(component, options) -> void` or default options object
@@ -107,7 +107,7 @@ class Pocket
 
   ###
   Convenience function to define several components at once.
-  @see Pocket::component
+  @see RocketEngine::component
   @param  {Object} components mapping of names to initializers
   ###
   components: (components) ->
@@ -135,6 +135,7 @@ class Pocket
   @param {String} key  key to look up
   @param {String} name component name
   @return {Object} component state for the key
+   - TODO: dataFor(key) constructs the entire data object? this would be expensive so be careful!
   ###
   dataFor: (key, name) -> @_components[name]?[key]
 
@@ -190,11 +191,11 @@ class Pocket
   ### SYSTEMS ###
 
   ###
-  Register a new {System} in the Pocket.
+  Register a new {System} in the Rocket.
   @param  {String}        name name of the system
   @param  {Array<String>} reqs array of required component names
   @param  {Function}      fn   system action function, invoked with
-                               (pocket, keys[], cName1{}, ..., cNameN{})
+                               (rocket, keys[], cName1{}, ..., cNameN{})
   @return {System} new instance of System that was added.
   ###
   system: (name, reqs, fn) ->
@@ -203,12 +204,12 @@ class Pocket
     return system
 
   ###
-  Register a new {System} in the Pocket that calls its function *for each* key
+  Register a new {System} in the Rocket that calls its function *for each* key
   that matches the requirements, to reduce boilerplate.
   @param {String}        name name of the system
   @param {Array<String>} reqs array of required component names
   @param {Function}      fn   system action function for each key, invoked with
-                              (pocket, key, cValue1, ..., cValueN)
+                              (rocket, key, cValue1, ..., cValueN)
   @return {System} new instance of System that was added.
   ###
   systemForEach: (name, reqs, fn) -> @system System.forEach(name, reqs, fn)
@@ -239,7 +240,7 @@ class Pocket
       system.action @, keys, reqs...
 
   ###
-  Perform one tick of the Pocket environment: destroy marked keys and run all systems.
+  Perform one tick of the Rocket environment: destroy marked keys and run all systems.
   This function is intended to be wrapped in a `requestAnimationFrame` loop so it will
   be run every frame.
   @param {DOMHighResTimeStamp} time a timestamp from `requestAnimationFrame`
@@ -252,4 +253,4 @@ class Pocket
     @_runSystems()
     return
 
-module.exports = Pocket
+module.exports = RocketEngine

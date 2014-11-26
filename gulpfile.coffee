@@ -55,12 +55,12 @@ gulp.task 'sass', ->
       .pipe gulp.dest(destination)
 
 gulp.task 'src', ->
-  # bundle Pocket library into pocket.js, export global
+  # bundle Rocket library into rocket.js, export global
   source = require 'vinyl-source-stream'
   browserify = require 'browserify'
-  browserify './src/pocket.coffee', {standalone: 'Pocket'}
+  browserify './src/rocket.coffee', {standalone: 'Rocket'}
     .bundle()
-    .pipe source('pocket.js')
+    .pipe source('rocket.js')
     .pipe gulp.dest(destination)
 
 gulp.task 'demos', ->
