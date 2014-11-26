@@ -1,4 +1,4 @@
-# Rocket Engine [![Build Status](https://travis-ci.org/giladgray/pocket.svg?branch=master)](https://travis-ci.org/giladgray/pocket)
+# Rocket Engine [![Build Status](https://travis-ci.org/giladgray/rocket-engine.svg?branch=master)](https://travis-ci.org/giladgray/rocket-engine)
 
 > A little game engine that'll take you over the moon.
 
