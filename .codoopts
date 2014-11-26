@@ -1,6 +1,6 @@
---name       "Pocket"
+--name       "Rocket Engine"
 --readme     README.md
---title      "Pocket Documentation"
+--title      "Rocket Engine Documentation"
 --private
 --quiet
 --extension  coffee
