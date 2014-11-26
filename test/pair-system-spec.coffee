@@ -1,24 +1,24 @@
 chai = require 'chai'
 expect = chai.expect
 
-Pocket = require '../src/pocket.coffee'
+Rocket = require '../src/rocket.coffee'
 PairSystem = require '../src/utils/pair-system.coffee'
 
 describe 'PairSystem', ->
-  pocket = null
+  rocket = null
   beforeEach ->
-    pocket = new Pocket
+    rocket = new Rocket
 
-  fillPocket = (a, b) ->
+  fillRocket = (a, b) ->
     a ?= 'abc'.split('')
     b ?= '123'.split('')
-    pocket.component 'letter', {index: '0'}
-    pocket.component 'number', {index: 0}
+    rocket.component 'letter', {index: '0'}
+    rocket.component 'number', {index: 0}
     for l in a
-      pocket.key
+      rocket.key
         letter: {index: l}
     for n in b
-      pocket.key
+      rocket.key
         number: {index: n}
     return [a, b]
 
@@ -46,18 +46,18 @@ describe 'PairSystem', ->
     expect(sys.action).to.not.equal actionFn
 
   describe '#action', ->
-    it 'should run as a system in a pocket', ->
-      fillPocket('a', '1')
+    it 'should run as a system in a Rocket', ->
+      fillRocket('a', '1')
       sys = new PairSystem 'a1-all', ['letter'], ['number'], (p, [a, l], [b, n]) ->
         @result = l[a[0]].index + n[b[0]].index
-      pocket.system sys
-      pocket._runSystems()
+      rocket.system sys
+      rocket._runSystems()
       expect(sys.result).to.equal 'a1'
 
     it 'should be invoked in PairSystem context', ->
-      fillPocket('a', '1')
+      fillRocket('a', '1')
       sys = new PairSystem 'empty', ['letter'], ['number'], -> sys.context = @
-      sys.action(pocket)
+      sys.action(rocket)
       expect(sys.context).to.deep.equal sys
 
   describe '.forEach', ->
@@ -65,13 +65,13 @@ describe 'PairSystem', ->
       expect(PairSystem.forEach('name', ['reqsA'], ['reqsB'], ->)).to.be.instanceof PairSystem
 
     it 'should create an action function that calls the given function for each key', ->
-      [keysA, keysB] = fillPocket()
+      [keysA, keysB] = fillRocket()
       expected = []
       for a in keysA
         for b in keysB
           expected.push a + b
       fnKeys = []
-      pocket.system PairSystem.forEach 'a1...', ['letter'], ['number'],
-        (pocket, [a, letter], [b, number]) -> fnKeys.push letter.index + number.index
-      pocket._runSystems()
+      rocket.system PairSystem.forEach 'a1...', ['letter'], ['number'],
+        (rocket, [a, letter], [b, number]) -> fnKeys.push letter.index + number.index
+      rocket._runSystems()
       expect(fnKeys).to.deep.equal expected
