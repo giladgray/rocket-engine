@@ -64,14 +64,15 @@ gulp.task 'src', ->
     .pipe gulp.dest(destination)
 
 gulp.task 'demos', ->
-  # compile demo scripts
-  coffee = require 'gulp-coffee'
-  sourcemaps = require 'gulp-sourcemaps'
+  # bundle each demo into a js file
+  rename = require 'gulp-rename'
+  browserify = require 'browserify'
+  transform = require 'vinyl-transform'
+  browserified = transform (filename) ->
+    browserify(filename).bundle()
   gulp.src sources.demos, base: 'demos'
-      .pipe sourcemaps.init()
-      .pipe coffee()
-        .on 'error', notify.onError('Coffee: <%= error.message %>')
-      .pipe sourcemaps.write()
+      .pipe browserified
+      .pipe rename(extname: '.js')
       .pipe gulp.dest(destination)
 
 # Compile all sources!

@@ -1,3 +1,5 @@
+Vector = require '../../src/utils/vector.coffee'
+
 random = (min, max) ->
   unless max?
     max = min
@@ -14,58 +16,22 @@ updateCount = (delta) ->
 
 rocket = new Rocket
 
-# context-2d component for storing CanvasRenderingContext2D and other canvas info
-rocket.component 'context-2d', (cmp, {canvas}) ->
-  cmp.canvas = document.querySelector canvas or '#canvas'
-  cmp.g2d = cmp.canvas.getContext('2d')
-  cmp.center = {x: 0, y: 0}
-
-  # ensure canvas is as large as possible
-  window.addEventListener 'resize', resize = ->
-    cmp.canvas.width = document.body.clientWidth
-    cmp.canvas.height = document.body.clientHeight
-    cmp.width = cmp.canvas.width
-    cmp.height = cmp.canvas.height
-    cmp.center.x = cmp.canvas.width / 2
-    cmp.center.y = cmp.canvas.height / 2
-  resize()
-
-# the context-2d data object
-rocket.key {'context-2d': null}
-
-# maintain keyboard state. this guy mutates himself, it's prety badass
-rocket.component 'keyboard-state', (cmp, {target, keymap}) ->
-  cmp.target = target or document
-  cmp.down = {}
-  # returns true if the named key was pressed in the last X milliseconds
-  cmp.isNewPress = (keyName, recency = 16) ->
-    downTime = cmp.down[keyName]
-    delta = Date.now() - downTime
-    return downTime and 0 < delta < recency
-
-  cmp.target.addEventListener 'keydown', (e) ->
-    keyName = keymap[e.which]
-    cmp.down[e.which] = true
-    if keyName and not cmp.down[keyName]
-      # record time it was pressed
-      cmp.down[keyName] = Date.now()
-
-  cmp.target.addEventListener 'keyup', (e) ->
-    keyName = keymap[e.which]
-    cmp.down[e.which] = false
-    if keyName
-      cmp.down[keyName] = 0
+# the Canvas-2D data object
+rocket.component 'canvas', require '../../src/utils/canvas-2d.coffee'
+rocket.key canvas:
+  width: 'auto'
+  height: 'auto'
+canvas = rocket.getData 'canvas'
 
 # the keyboard-state data object
-rocket.key
-  'input': null
-  'keyboard-state':
-    keymap:
-      13: 'ADD'
-      32: 'DESTROY'
+rocket.component 'keyboard', require '../../src/utils/keyboard-state.coffee'
+rocket.key keyboard:
+  keymap:
+    13: 'ADD'
+    32: 'DESTROY'
 
 # keyboard commands
-rocket.systemForEach 'input-balls', ['keyboard-state'], (rocket, key, keyboard) ->
+rocket.systemForEach 'input-balls', ['keyboard'], (rocket, key, keyboard) ->
   if keyboard.isNewPress 'DESTROY'
     rocket.destroyKeys rocket.filterKeys('ball')
     updateCount(0)
@@ -88,7 +54,7 @@ nextColor = ->
 # make a ball with random attributes
 randomBall = ->
   updateCount(1)
-  {width, height} = rocket.getData 'context-2d'
+  {width, height} = canvas
   radius = random(20, 100)
   rocket.key {
     ball: true
@@ -116,12 +82,12 @@ rocket.systemForEach 'move', ['position', 'velocity'], (rocket, key, pos, vel) -
 
 # clear the canvas each frame
 rocket.system 'clear-canvas', [], (rocket) ->
-  {g2d, width, height} = rocket.getData 'context-2d'
+  {g2d, width, height} = canvas
   g2d.clearRect 0, 0, width, height
 
 # draw each balls
 rocket.systemForEach 'draw-ball', ['position', 'circle'], (rocket, key, pos, circle) ->
-  {g2d} = rocket.getData 'context-2d'
+  {g2d} = canvas
   g2d.beginPath()
   g2d.fillStyle = circle.color
   g2d.arc pos.x, pos.y, circle.radius, 0, Math.PI * 2
@@ -130,7 +96,7 @@ rocket.systemForEach 'draw-ball', ['position', 'circle'], (rocket, key, pos, cir
 
 # bounce each ball when they reach the edge of the canvas
 rocket.systemForEach 'bounce', ['position', 'velocity', 'circle'], (pkt, key, pos, vel, {radius}) ->
-  {width, height} = pkt.getData 'context-2d'
+  {width, height} = canvas
   if pos.x < radius or pos.x > width - radius
     vel.x *= -1
     pos.x += vel.x

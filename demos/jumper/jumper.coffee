@@ -1,90 +1,53 @@
+Vector = require '../../src/utils/vector.coffee'
+Rectangle = require '../../src/utils/rectangle.coffee'
+Keeper = require '../../src/utils/score-keeper.coffee'
+
 random = (min, max) ->
   unless max?
     max = min
     min = 0
   return Math.floor(Math.random() * (max - min)) + min
 
-rectangle = (rect1...) ->
-  overlaps: (rect2...) ->
-    xOverlap = yOverlap = true
-    if rect1[0] > rect2[0] + rect2[2] or rect1[0] + rect1[2] < rect2[0]
-      xOverlap = false
-    if rect1[1] > rect2[1] + rect2[3] or rect1[1] + rect1[3] < rect2[1]
-      yOverlap = false
-    return xOverlap and yOverlap
-
 rocket = new Rocket
 
-# context-2d component for storing CanvasRenderingContext2D and other canvas info
-rocket.component 'context-2d', (cmp, {canvas}) ->
-  cmp.canvas = document.querySelector canvas or '#canvas'
-  cmp.g2d = cmp.canvas.getContext('2d')
-  cmp.center = {x: 0, y: 0}
+# track the score
+rocket.score = new Keeper
+scoreEl = document.querySelector '.scores .current'
+highscoreEl = document.querySelector '.scores .best'
+rocket.score.on 'score',     (points) -> scoreEl.textContent = points
+rocket.score.on 'highscore', (points) -> highscoreEl.textContent = points
 
-  # ensure canvas is as large as possible
-  window.addEventListener 'resize', resize = ->
-    cmp.canvas.width = document.body.clientWidth
-    cmp.canvas.height = document.body.clientHeight
-    cmp.width = cmp.canvas.width
-    cmp.height = cmp.canvas.height
-  resize()
-
-# the context-2d data object
-rocket.key {'context-2d': null}
-
-# maintain keyboard state. this guy mutates himself, it's prety badass
-rocket.component 'keyboard-state', (cmp, {target, keymap}) ->
-  cmp.target = target or document
-  cmp.down = {}
-  # returns true if the named key was pressed in the last X milliseconds
-  cmp.isNewPress = (keyName, recency = 10) ->
-    downTime = cmp.down[keyName]
-    delta = Date.now() - downTime
-    if downTime > 0 and delta > recency
-      cmp.down[keyName] = -1
-      return true
-    return false
-
-  cmp.target.addEventListener 'keydown', (e) ->
-    keyName = keymap[e.which]
-    cmp.down[e.which] = true
-    if keyName and cmp.down[keyName] is 0
-      # record time it was pressed
-      cmp.down[keyName] = Date.now()
-
-  cmp.target.addEventListener 'keyup', (e) ->
-    keyName = keymap[e.which]
-    cmp.down[e.which] = false
-    if keyName
-      cmp.down[keyName] = 0
+# the Canvas-2D data object
+rocket.component 'canvas', require '../../src/utils/canvas-2d.coffee'
+rocket.key canvas:
+  width: 'auto'
+  height: 'auto'
+ctx = rocket.getData 'canvas'
+ctx.center = Vector.new(ctx.width / 2, ctx.height / 2)
 
 # the keyboard-state data object
-rocket.key
-  'input': null
-  'keyboard-state':
-    keymap:
-      37: 'LEFT'
-      39: 'RIGHT'
-
+rocket.component 'keyboard', require '../../src/utils/keyboard-state.coffee'
+rocket.key keyboard:
+  keymap:
+    37: 'LEFT'
+    39: 'RIGHT'
+keyboard = rocket.getData 'keyboard'
 
 # constants
-ctx = rocket.getData 'context-2d'
-ctx.center = {x: ctx.width / 2, y: ctx.height / 2}
-
 GRAVITY = 0.4
 BARRIER_DISTANCE = ctx.height * 3 / 4
 BARRIER_WIDTH = 200
 
 # game components
-rocket.component 'position', {x: 0, y: 0}
-rocket.component 'velocity', {x: 0, y: 0}
+rocket.component 'position', Vector.new()
+rocket.component 'velocity', Vector.new()
 rocket.component 'square',   {size: 30, color: 'cornflowerblue', angle: 0}
 rocket.component 'barrier',  {height: 50, gapWidth: BARRIER_WIDTH, x: 0, y: 0, color: 'cornflowerblue'}
 
 rocket.player = rocket.key
   amazing: true
   square: {color: 'black', angle: Math.PI / 4, size: 20}
-  position: {x: ctx.center.x, y: ctx.center.y + ctx.height / 4}
+  position: Vector.new(ctx.center.x, ctx.center.y + ctx.height / 4)
   velocity: null
 
 level = -1
@@ -108,50 +71,38 @@ addLevel = ->
   lastBarrierX = barrier.x
 addLevel() for i in [1..3]
 
-score = 0
-bestScore = 0
-scoreEl = document.querySelector '.scores .current'
-highscoreEl = document.querySelector '.scores .best'
-scoreOne = ->
-  scoreEl.textContent = ++score
-scoreZero = ->
-  if score > bestScore
-    highscoreEl.textContent = bestScore = score
-  scoreEl.textContent = score = 0
-
 rocket.system 'level-barrier', ['barrier', 'evil'], (rocket, keys, barriers) ->
   pPos = rocket.dataFor rocket.player, 'position'
   pSq  = rocket.dataFor rocket.player, 'square'
-  playerRect = rectangle(pPos.x, pPos.y + ctx.width / 3, pSq.size, pSq.size)
+  playerRect = Rectangle.new(pPos.x, pPos.y + ctx.width / 3, pSq.size, pSq.size)
   for key in keys
     barrier = barriers[key]
     continue if barrier.marked?
-    if playerRect.overlaps(0, barrier.y, ctx.width, barrier.height)
-      barrier.color = 'red'
-      barrier.marked = false
-    if playerRect.overlaps(barrier.x, barrier.y, barrier.gapWidth, barrier.height)
+    if Rectangle.overlap playerRect, Rectangle.new(barrier.x, barrier.y, barrier.gapWidth, barrier.height)
       barrier.color = 'green'
       barrier.marked = true
-      scoreOne()
-    if barrier.marked is false then scoreZero()
+    if Rectangle.overlap playerRect, Rectangle.new(0, barrier.y, ctx.width, barrier.height)
+      barrier.color = 'red'
+      barrier.marked = false
+    if barrier.marked is false then rocket.score.reset()
+    else rocket.score.addPoints 1
 
 rocket.system 'square-smash', ['position', 'square', 'evil'], (rocket, keys, positions, squares) ->
   pPos = rocket.dataFor rocket.player, 'position'
   pSq  = rocket.dataFor rocket.player, 'square'
-  playerRect = rectangle(pPos.x, pPos.y + ctx.width / 3, pSq.size, pSq.size)
+  playerRect = Rectangle.new(pPos.x, pPos.y + ctx.width / 3, pSq.size, pSq.size)
   for key in keys
     position = positions[key]
     square   = squares[key]
     continue if square.marked
-    if playerRect.overlaps position.x, position.y, square.size, square.size
+    if Rectangle.overlap playerRect, Rectangle.new(position.x, position.y, square.size, square.size)
       square.color = 'red'
       square.marked = true
-      scoreZero()
+      rocket.score.reset()
 
 # keyboard commands
-MOVE = {x: 2, y: 12}
+MOVE = Vector.new(2, 12)
 rocket.systemForEach 'input-brick', ['velocity', 'amazing'], (rocket, key, velocity) ->
-  keyboard = rocket.getData 'keyboard-state'
   jump = 0
   if keyboard.isNewPress 'LEFT'
     jump = -MOVE.x
