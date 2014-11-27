@@ -29,7 +29,7 @@ rocket.key keyboard:
 keyboard = rocket.getData 'keyboard'
 
 # constants
-GRAVITY = 0.4
+GRAVITY = Vector.new(0, -0.4)
 BARRIER_DISTANCE = ctx.height * 3 / 4
 BARRIER_WIDTH = 200
 
@@ -37,7 +37,7 @@ BARRIER_WIDTH = 200
 rocket.component 'position', Vector.new()
 rocket.component 'velocity', Vector.new()
 rocket.component 'square',   {size: 30, color: 'cornflowerblue', angle: 0}
-rocket.component 'barrier',  {height: 50, gapWidth: BARRIER_WIDTH, x: 0, y: 0, color: 'cornflowerblue'}
+rocket.component 'barrier',  {color: 'cornflowerblue'}
 
 rocket.player = rocket.key
   amazing: true
@@ -46,24 +46,24 @@ rocket.player = rocket.key
   velocity: null
 
 level = -1
-lastBarrierX = ctx.center.x
+lastGapLeft = ctx.center.x
 addLevel = ->
-  barrier = {x: ctx.center.x + fn.random(-150, 150), y: 100 - BARRIER_DISTANCE * level++}
-  squareX = (barrier.x + lastBarrierX) / 2 + BARRIER_WIDTH / 2
+  barrier = Rectangle.centered ctx.center.x + fn.random(-150, 150), 100 - BARRIER_DISTANCE * level++, BARRIER_WIDTH, 50
+  squareX = (barrier.left + lastGapLeft + BARRIER_WIDTH) / 2
   rocket.key {evil: true, barrier}
   rocket.key
     evil: true
     square: null
     position:
       x: squareX + fn.random(-BARRIER_WIDTH / 2, BARRIER_WIDTH / 2)
-      y: barrier.y - BARRIER_DISTANCE * 2 / 3
+      y: barrier.top - BARRIER_DISTANCE * 2 / 3
   rocket.key
     evil: true
     square: null
     position:
       x: squareX + fn.random(-BARRIER_WIDTH / 2, BARRIER_WIDTH / 2)
-      y: barrier.y - BARRIER_DISTANCE / 3
-  lastBarrierX = barrier.x
+      y: barrier.top - BARRIER_DISTANCE / 3
+  lastGapLeft = barrier.left
 addLevel() for i in [1..3]
 
 rocket.system 'level-barrier', ['barrier', 'evil'], (rocket, keys, barriers) ->
@@ -73,10 +73,10 @@ rocket.system 'level-barrier', ['barrier', 'evil'], (rocket, keys, barriers) ->
   for key in keys
     barrier = barriers[key]
     continue if barrier.marked?
-    if Rectangle.overlap playerRect, Rectangle.new(0, barrier.y, ctx.width, barrier.height)
+    if Rectangle.overlap playerRect, Rectangle.new(0, barrier.top, ctx.width, barrier.height)
       barrier.color = 'red'
       barrier.marked = false
-    if Rectangle.overlap playerRect, Rectangle.new(barrier.x, barrier.y, barrier.gapWidth, barrier.height)
+    if Rectangle.overlap playerRect, barrier
       barrier.color = 'green'
       barrier.marked = true
       rocket.score.addPoints 1
@@ -109,7 +109,7 @@ rocket.systemForEach 'input-brick', ['velocity', 'amazing'], (rocket, key, veloc
 
 # apply gravity
 rocket.systemForEach 'gravity', ['velocity'], (rocket, key, vel) ->
-  vel.y -= GRAVITY
+  Vector.add vel, GRAVITY
 
 # move each ball
 rocket.systemForEach 'move', ['position', 'velocity'], (rocket, key, pos, vel) ->
@@ -119,7 +119,7 @@ rocket.systemForEach 'move', ['position', 'velocity'], (rocket, key, pos, vel) -
 
 # move barriers and evil squares ahead once you pass them so they'll get reused
 rocket.systemForEach 'destroy-barrier', ['barrier', 'evil'], (rocket, key, barrier) ->
-  if barrier.y - BARRIER_DISTANCE * 2 > ctx.center.y
+  if barrier.top - BARRIER_DISTANCE * 2 > ctx.center.y
     rocket.destroyKey key
     addLevel()
 rocket.systemForEach 'destroy-square', ['position', 'evil'], (rocket, key, pos) ->
@@ -148,10 +148,10 @@ rocket.systemForEach 'draw-barrier', ['barrier'], (rocket, key, barrier) ->
   {g2d, width, center} = ctx
   g2d.save()
   g2d.beginPath()
-  g2d.translate 0, barrier.y - center.y
+  g2d.translate 0, barrier.top - center.y
   g2d.fillStyle = barrier.color
-  g2d.rect 0, 0, barrier.x, barrier.height
-  g2d.rect barrier.x + barrier.gapWidth, 0, width - barrier.gapWidth, barrier.height
+  g2d.rect 0, 0, barrier.left, barrier.height
+  g2d.rect barrier.left + barrier.width, 0, width - barrier.width, barrier.height
   g2d.fill()
   g2d.closePath()
   g2d.restore()
