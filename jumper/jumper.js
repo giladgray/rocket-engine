@@ -1,5 +1,5 @@
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
-var BARRIER_DISTANCE, BARRIER_WIDTH, GRAVITY, Keeper, MOVE, Rectangle, Vector, addLevel, ctx, fn, highscoreEl, i, keyboard, lastBarrierX, level, rocket, scoreEl, start, _i;
+var BARRIER_DISTANCE, BARRIER_WIDTH, GRAVITY, Keeper, MOVE, Rectangle, Vector, addLevel, ctx, fn, highscoreEl, i, keyboard, lastGapLeft, level, rocket, scoreEl, start, _i;
 
 fn = require('../../src/fn.coffee');
 
@@ -51,7 +51,7 @@ rocket.key({
 
 keyboard = rocket.getData('keyboard');
 
-GRAVITY = 0.4;
+GRAVITY = Vector["new"](0, -0.4);
 
 BARRIER_DISTANCE = ctx.height * 3 / 4;
 
@@ -68,10 +68,6 @@ rocket.component('square', {
 });
 
 rocket.component('barrier', {
-  height: 50,
-  gapWidth: BARRIER_WIDTH,
-  x: 0,
-  y: 0,
   color: 'cornflowerblue'
 });
 
@@ -88,15 +84,12 @@ rocket.player = rocket.key({
 
 level = -1;
 
-lastBarrierX = ctx.center.x;
+lastGapLeft = ctx.center.x;
 
 addLevel = function() {
   var barrier, squareX;
-  barrier = {
-    x: ctx.center.x + fn.random(-150, 150),
-    y: 100 - BARRIER_DISTANCE * level++
-  };
-  squareX = (barrier.x + lastBarrierX) / 2 + BARRIER_WIDTH / 2;
+  barrier = Rectangle.centered(ctx.center.x + fn.random(-150, 150), 100 - BARRIER_DISTANCE * level++, BARRIER_WIDTH, 50);
+  squareX = (barrier.left + lastGapLeft + BARRIER_WIDTH) / 2;
   rocket.key({
     evil: true,
     barrier: barrier
@@ -106,7 +99,7 @@ addLevel = function() {
     square: null,
     position: {
       x: squareX + fn.random(-BARRIER_WIDTH / 2, BARRIER_WIDTH / 2),
-      y: barrier.y - BARRIER_DISTANCE * 2 / 3
+      y: barrier.top - BARRIER_DISTANCE * 2 / 3
     }
   });
   rocket.key({
@@ -114,10 +107,10 @@ addLevel = function() {
     square: null,
     position: {
       x: squareX + fn.random(-BARRIER_WIDTH / 2, BARRIER_WIDTH / 2),
-      y: barrier.y - BARRIER_DISTANCE / 3
+      y: barrier.top - BARRIER_DISTANCE / 3
     }
   });
-  return lastBarrierX = barrier.x;
+  return lastGapLeft = barrier.left;
 };
 
 for (i = _i = 1; _i <= 3; i = ++_i) {
@@ -136,11 +129,11 @@ rocket.system('level-barrier', ['barrier', 'evil'], function(rocket, keys, barri
     if (barrier.marked != null) {
       continue;
     }
-    if (Rectangle.overlap(playerRect, Rectangle["new"](0, barrier.y, ctx.width, barrier.height))) {
+    if (Rectangle.overlap(playerRect, Rectangle["new"](0, barrier.top, ctx.width, barrier.height))) {
       barrier.color = 'red';
       barrier.marked = false;
     }
-    if (Rectangle.overlap(playerRect, Rectangle["new"](barrier.x, barrier.y, barrier.gapWidth, barrier.height))) {
+    if (Rectangle.overlap(playerRect, barrier)) {
       barrier.color = 'green';
       barrier.marked = true;
       rocket.score.addPoints(1);
@@ -196,7 +189,7 @@ rocket.systemForEach('input-brick', ['velocity', 'amazing'], function(rocket, ke
 });
 
 rocket.systemForEach('gravity', ['velocity'], function(rocket, key, vel) {
-  return vel.y -= GRAVITY;
+  return Vector.add(vel, GRAVITY);
 });
 
 rocket.systemForEach('move', ['position', 'velocity'], function(rocket, key, pos, vel) {
@@ -206,7 +199,7 @@ rocket.systemForEach('move', ['position', 'velocity'], function(rocket, key, pos
 });
 
 rocket.systemForEach('destroy-barrier', ['barrier', 'evil'], function(rocket, key, barrier) {
-  if (barrier.y - BARRIER_DISTANCE * 2 > ctx.center.y) {
+  if (barrier.top - BARRIER_DISTANCE * 2 > ctx.center.y) {
     rocket.destroyKey(key);
     return addLevel();
   }
@@ -242,10 +235,10 @@ rocket.systemForEach('draw-barrier', ['barrier'], function(rocket, key, barrier)
   g2d = ctx.g2d, width = ctx.width, center = ctx.center;
   g2d.save();
   g2d.beginPath();
-  g2d.translate(0, barrier.y - center.y);
+  g2d.translate(0, barrier.top - center.y);
   g2d.fillStyle = barrier.color;
-  g2d.rect(0, 0, barrier.x, barrier.height);
-  g2d.rect(barrier.x + barrier.gapWidth, 0, width - barrier.gapWidth, barrier.height);
+  g2d.rect(0, 0, barrier.left, barrier.height);
+  g2d.rect(barrier.left + barrier.width, 0, width - barrier.width, barrier.height);
   g2d.fill();
   g2d.closePath();
   return g2d.restore();
