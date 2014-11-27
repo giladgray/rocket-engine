@@ -2,7 +2,7 @@
 <html>
   <head>
   <meta charset='UTF-8'>
-  <title>Pocket Documentation</title>
+  <title>Rocket Engine Documentation</title>
   <script src='../javascript/application.js'></script>
   <script src='../javascript/search.js'></script>
   <link rel='stylesheet' href='../stylesheets/application.css' type='text/css'>
@@ -11,8 +11,8 @@
     <div id='base' data-path='../'></div>
 <div id='header'>
   <div id='menu'>
-    <a href='../extra/README.md.html' title='Pocket'>
-      Pocket
+    <a href='../extra/README.md.html' title='Rocket Engine'>
+      Rocket Engine
     </a>
     &raquo;
     <a href='../alphabetical_index.html' title='Index'>
@@ -34,80 +34,77 @@
         </p>
       </nav>
       <div id='filecontents'>
-        <h1 id="pocket-build-status-https-travis-ci-org-giladgray-pocket-svg-branch-master-https-travis-ci-org-giladgray-pocket-">Pocket <a href="https://travis-ci.org/giladgray/pocket"><img src="https://travis-ci.org/giladgray/pocket.svg?branch=master" alt="Build Status"></a></h1>
-<blockquote><p>A little game engine that fits in your pocket.</p></blockquote>
+        <h1 id="rocket-engine-build-status-https-travis-ci-org-giladgray-rocket-engine-svg-branch-master-https-travis-ci-org-giladgray-rocket-engine-">Rocket Engine <a href="https://travis-ci.org/giladgray/rocket-engine"><img src="https://travis-ci.org/giladgray/rocket-engine.svg?branch=master" alt="Build Status"></a></h1>
+<blockquote><p>A little game engine that&#39;ll take you over the moon.</p></blockquote>
 <h2 id="development">Development</h2>
 <ol>
 <li><code>npm install</code></li>
 <li><code>gulp watch</code> to lint and test :coffee:</li>
 </ol>
 <h2 id="usage">Usage</h2>
-<pre><code class="lang-coffeescript">Pocket = require &#39;pocket&#39;
+<pre><code class="lang-coffeescript">Rocket = require &#39;rocket-engine&#39;
 
-pocket = new Pocket
+rocket = new Rocket
 
 # 1. define components as functions that assign values...
-pocket.component &#39;position&#39;, (cmp, options) -&gt;
+rocket.component &#39;position&#39;, (cmp, options) -&gt;
   cmp = {x: options.x ? 0, y: options.y ? 0}
 # ...or as default value objects
-pocket.component &#39;velocity&#39;, {x: 0, y: 0}
+rocket.component &#39;velocity&#39;, {x: 0, y: 0}
 
 # 2. define systems that operate on keys with specific components
-pocket.systemForEach &#39;move&#39;, # friendly name
+rocket.systemForEach &#39;move&#39;,
   # required components for a key
   [&#39;position&#39;, &#39;velocity&#39;],
   # function to call for each key that has all components
-  (pocket, key, position, velocity) -&gt;
+  (rocket, key, position, velocity) -&gt;
     position.x += velocity.x
     position.y += velocity.y
 
 # 3. add keys that contain components
-pocket.key {
-  spaceship : true # a label*
+rocket.key {
+  spaceship : true # a label, for filtering
   velocity  : null # use default component values
   position  : {x: WIDTH / 2, y: HEIGHT / 2}
 }
-
-# * a label is simply a component without a definition,
-# used to tag keys for easy discovery.
 </code></pre>
 <h2 id="advanced-systems-design">Advanced Systems Design</h2>
 <h3 id="data-components">Data Components</h3>
 <pre><code class="lang-coffeescript"># singleton data can be stored as a key with a single component
-pocket.component &#39;config&#39;, require &#39;./config&#39;
-pocket.key &#39;config&#39;, {config: null}
+rocket.component &#39;config&#39;, require &#39;./config&#39;
+rocket.key &#39;config&#39;, {config: null}
 # and treated as data rather than a standard key
-config = pocket.getData &#39;config&#39;
+config = rocket.getData &#39;config&#39;
 </code></pre>
-<h3 id="-pocket-systemforeach-"><code>pocket.systemForEach</code></h3>
+<h3 id="-rocket-systemforeach-"><code>rocket.systemForEach</code></h3>
 <pre><code class="lang-coffeescript"># a system that operates on multiple keys can use systemForEach
 # to reduce boilerplate. turn this:
-pocket.system &#39;move&#39;, [&#39;position&#39;, &#39;velocity&#39;],
-  (pocket, keys, position, velocity) -&gt;
+rocket.system &#39;move&#39;, [&#39;position&#39;, &#39;velocity&#39;],
+  (rocket, keys, position, velocity) -&gt;
     for key in keys
       Vector.add position[key], velocity[key]
 # into this:
-pocket.systemForEach &#39;move&#39;, [&#39;position&#39;, &#39;velocity&#39;],
-  (pocket, key, pos, vel) -&gt; Vector.add pos, vel
+rocket.systemForEach &#39;move&#39;, [&#39;position&#39;, &#39;velocity&#39;],
+  (rocket, key, pos, vel) -&gt; Vector.add pos, vel
 </code></pre>
 <h3 id="custom-systems">Custom Systems</h3>
-<pre><code class="lang-coffeescript"># pocket.system accepts instances of System too. Feel free to abuse the system...
-Rectangle = require &#39;pocket/src/utils/rectangle.coffee&#39;
-PairSystem = require &#39;pocket/src/utils/pair-system.coffee&#39;
-pocket.system PairSystem.forEach &#39;square-on-square-action&#39;,
+<pre><code class="lang-coffeescript"># rocket.system accepts instances of System too. Feel free to abuse the system...
+Rectangle  = require &#39;rocket-engine/src/utils/rectangle.coffee&#39;
+PairSystem = require &#39;rocket-engine/src/utils/pair-system.coffee&#39;
+rocket.system PairSystem.forEach &#39;square-on-square-action&#39;,
   [&#39;square&#39;, &#39;position&#39;], [&#39;square&#39;, &#39;position&#39;],
-  (pocket, [keyA, squareA, positionA], [keyB, squareB, positionB]) -&gt;
+  (rocket, [keyA, squareA, positionA], [keyB, squareB, positionB]) -&gt;
     continue if keyA is keyB
     rectA = Rectangle.new(positionA.x, positionA.y, squareA.size)
     rectB = Rectangle.new(positionB.x, positionB.y, squareB.size)
-    pocket.destroyKeys(keyA, keyB) if Rectangle.overlap(rectA, rectB)
+    rocket.destroyKeys(keyA, keyB) if Rectangle.overlap(rectA, rectB)
 </code></pre>
-<h2 id="meet-the-utilities">Meet the Utilities</h2><p>Pocket comes with a number of utilities components and libraries, which can be
-found in <a href="https://github.com/giladgray/pocket/tree/master/src/utils"><code>src/utils/</code></a>.
+<h2 id="meet-the-utilities">Meet the Utilities</h2><p>Rocket comes with a number of utilities components and libraries, which can be
+found in <a href="https://github.com/giladgray/rocket-engine/tree/master/src/utils"><code>src/utils/</code></a>.
 All you need to do is require them, register the component with a name you&#39;ll
 remember, and start jamming.</p><h3 id="keyboardstate">KeyboardState</h3><p>A component that stores the current keyboard state and supports a keymap of named keys.</p><pre><code class="lang-coffeescript"># create a new keyboard using the &quot;Data Component&quot; pattern above
-pocket.component &#39;keyboard&#39;, require &#39;pocket/src/utils/keyboard-state.coffee&#39;
-pocket.key
+rocket.component &#39;keyboard&#39;, require &#39;rocket-engine/src/utils/keyboard-state.coffee&#39;
+rocket.key
   keyboard:
     # omg custom key names!!
     keymap:
@@ -116,25 +113,25 @@ pocket.key
       A: &#39;ROLL_LEFT&#39;
       D: &#39;ROLL_RIGHT&#39;
 # sometimes it&#39;s easiest to just create a global reference...
-keyboard = pocket.getData &#39;keyboard&#39;
-pocket.system &#39;keyboarding&#39;, [], (pocket) -&gt;
+keyboard = rocket.getData &#39;keyboard&#39;
+rocket.system &#39;keyboarding&#39;, [], (rocket) -&gt;
   console.log keyboard.down.JUMP
 </code></pre>
 <h3 id="mousestate">MouseState</h3><p>A component that stores current mouse cursor location and button state.</p><pre><code class="lang-coffeescript"># create a new mouse using the &quot;Data Component&quot; pattern above
-pocket.component &#39;mouse&#39;, require &#39;pocket/src/utils/mouse-state.coffee&#39;
-pocket.key {mouse: null}
-mouse = pocket.getData &#39;mouse&#39;
-pocket.system &#39;mouse-master&#39;, [], (pocket) -&gt;
+rocket.component &#39;mouse&#39;, require &#39;rocket-engine/src/utils/mouse-state.coffee&#39;
+rocket.key {mouse: null}
+mouse = rocket.getData &#39;mouse&#39;
+rocket.system &#39;mouse-master&#39;, [], (rocket) -&gt;
   if mouse.buttons.left then alert(&#39;you\&#39;re the mouse master!&#39;)
 </code></pre>
 <h3 id="canvas2d">Canvas2D</h3><p>A component that stores a CanvasRenderingContext2D and various useful 2D canvas
 drawing properties.</p><pre><code class="lang-coffeescript"># create a new mouse using the &quot;Data Component&quot; pattern above
-pocket.component &#39;canvas&#39;, require &#39;pocket/src/utils/canvas-2d.coffee&#39;
-pocket.key canvas:
+rocket.component &#39;canvas&#39;, require &#39;rocket-engine/src/utils/canvas-2d.coffee&#39;
+rocket.key canvas:
   width: &#39;auto&#39;
   height: &#39;auto&#39;
-canvas = pocket.getData &#39;canvas&#39;
-pocket.system &#39;clear-canvas&#39;, [], (pocket) -&gt;
+canvas = rocket.getData &#39;canvas&#39;
+rocket.system &#39;clear-canvas&#39;, [], (rocket) -&gt;
   canvas.g2d.clearRect 0, 0, canvas.width, canvas.height
 </code></pre>
 <h3 id="pairsystem">PairSystem</h3><p>A subclass of System that takes <strong>two</strong> dependency arrays and provides its
@@ -143,18 +140,18 @@ accepts a function that is invoked for <strong>each pair</strong> of keys. It&#3
 two systems in one!</p><p>See <code>PairSystem</code> in action in the <a href="#custom-systems">Custom Systems</a> example above.</p><h3 id="vector-and-rectangle">Vector and Rectangle</h3><p>Static classes for manipulating 2D vectors of the form <code>{x, y}</code> and Rectangles
 like <code>{x, y, width, height}</code>. Vectors and Rectangles are just plain objects so
 they&#39;re fast and light. All operations happen through static functions that may
-modify their arguments, like <code>Vector.add(v1, v2)</code>.</p><p>See <code>Rectangle</code> in action in the <a href="#custom-systems">Custom Systems</a> example above.</p><pre><code class="lang-coffeescript">Vector = require &#39;pocket/src/utils/vector.coffee&#39;
+modify their arguments, like <code>Vector.add(v1, v2)</code>.</p><p>See <code>Rectangle</code> in action in the <a href="#custom-systems">Custom Systems</a> example above.</p><pre><code class="lang-coffeescript">Vector = require &#39;rocket-engine/src/utils/vector.coffee&#39;
 # define 2D components trivially
-pocket.component &#39;position&#39;, Vector.new()
-pocket.component &#39;velocity&#39;, Vector.new()
-pocket.systemForEach &#39;move&#39;, [&#39;position&#39;, &#39;velocity&#39;],
-  (pocket, key, pos, vel) -&gt; Vector.add pos, vel
+rocket.component &#39;position&#39;, Vector.new()
+rocket.component &#39;velocity&#39;, Vector.new()
+rocket.systemForEach &#39;move&#39;, [&#39;position&#39;, &#39;velocity&#39;],
+  (rocket, key, pos, vel) -&gt; Vector.add pos, vel
 </code></pre>
 <h3 id="scorekeeper">ScoreKeeper</h3><p>Keep score in your game and automatically update the high score. Persist your high
 scores across multiple sessions with built-in <code>localStorage</code> support. Emits events
-when points are added or a new highscore is set.</p><pre><code class="lang-coffeescript">ScoreKeeper = require &#39;pocket/src/utils/score-keeper.coffee&#39;
+when points are added or a new highscore is set.</p><pre><code class="lang-coffeescript">ScoreKeeper = require &#39;rocket-engine/src/utils/score-keeper.coffee&#39;
 keeper = new ScoreKeeper
-keeper.enableSaving &#39;demo-high-score&#39; # loads a high score of 8 from localStorag
+keeper.enableSaving &#39;demo-high-score&#39; # loads a high score of 8 from localStorage
 keeper.on &#39;score&#39;, (total, points) -&gt; alert &quot;#{total} (#{points})&quot;
 keeper.on &#39;highscore&#39;, (record) -&gt; alert &quot;crushed it! #{record}&quot;
 keeper.addScore(4) # -&gt; &quot;4 (4)&quot;
@@ -168,7 +165,7 @@ at JSConf EU 2014, and for his code at <a href="https://github.com/kirbysayshi/p
       </div>
     </div>
     <div id='footer'>
-  November 23, 14 14:02:03 by
+  November 26, 14 23:36:10 by
   <a href='https://github.com/coffeedoc/codo' title='CoffeeScript API documentation generator'>
     Codo
   </a>

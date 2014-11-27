@@ -56,6 +56,7 @@ a {
 .scores {
   position: absolute;
   left: 50%;
+  top: 0.8em;
   width: 4em;
   margin-left: -2em;
   text-align: center;

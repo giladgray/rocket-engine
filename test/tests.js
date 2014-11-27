@@ -5917,6 +5917,24 @@ Fn = (function() {
 
 
   /*
+  Returns a random integer between `[min, max)`: from `min` (inclusive) up to but
+  not including `max` (exclusive). If only one argument `max` is provided, the range
+  becomes `[0, max)`. Uses `Math.random()` internally.
+  @param min [Number] minimum value, inclusive; defaults to 0 if omitted
+  @param max [Number] maximum value, exclusive
+  @return [Number] random integer between `min` and `max`
+   */
+
+  Fn.random = function(min, max) {
+    if (max == null) {
+      max = min;
+      min = 0;
+    }
+    return Math.floor(Math.random() * (max - min)) + min;
+  };
+
+
+  /*
   Flattens a nested array (the nesting can be to any depth). Accepts a single array or splat of
   mixed types.
   @param arrays [Array...] a single array of splat of values to flatten
@@ -6036,7 +6054,7 @@ module.exports = Fn;
 
 
 },{}],39:[function(require,module,exports){
-var Pocket, System, _,
+var RocketEngine, System, _,
   __slice = [].slice;
 
 _ = require('./fn.coffee');
@@ -6048,16 +6066,16 @@ System = require('./system.coffee');
 @author Gilad Gray
 @license MIT
 
-Pocket: A data-driven game engine that fits in your pocket.
+Rocket Engine: A data-driven game engine that'll take you over the moon.
 
 Many thanks to kirbysayshi for inspiration and code samples.
 @see https://github.com/kirbysayshi/pocket-ces
  */
 
-Pocket = (function() {
-  Pocket.System = System;
+RocketEngine = (function() {
+  RocketEngine.System = System;
 
-  function Pocket() {
+  function RocketEngine() {
     this.time = 0;
     this._componentTypes = {};
     this._keys = {};
@@ -6072,12 +6090,12 @@ Pocket = (function() {
 
 
   /*
-  Store a new key in the Pocket.
+  Store a new key in the Rocket.
   @param  {Object} components mapping of component or label names to initial values
   @return {String}            ID of new key
    */
 
-  Pocket.prototype.key = function(components) {
+  RocketEngine.prototype.key = function(components) {
     var component, id, name, _ref;
     id = (_ref = components.id) != null ? _ref : _.uniqueId('key-');
     if (components.id && this._keys[components.id]) {
@@ -6095,12 +6113,12 @@ Pocket = (function() {
 
   /*
   Convenience method to add a series of keys at once.
-  @see Pocket::key
+  @see RocketEngine::key
   @param  {Array<Object>} keys an array or splat of key definitions
   @return {Array<String>}      IDs of new keys
    */
 
-  Pocket.prototype.keys = function() {
+  RocketEngine.prototype.keys = function() {
     var cmps, keys, _i, _len, _ref, _results;
     keys = 1 <= arguments.length ? __slice.call(arguments, 0) : [];
     _ref = _.flatten(keys);
@@ -6114,19 +6132,19 @@ Pocket = (function() {
 
 
   /*
-  Returns an array of all keys currently in the pocket.
-  @return {Array<String>} all the keys in the pocket
+  Returns an array of all existing keys.
+  @return {Array<String>} all existing keys
    */
 
-  Pocket.prototype.getKeys = function() {
+  RocketEngine.prototype.getKeys = function() {
     return Object.keys(this._keys);
   };
 
-  Pocket.prototype.destroyKey = function(id) {
+  RocketEngine.prototype.destroyKey = function(id) {
     return this._keysToDestroy[id] = true;
   };
 
-  Pocket.prototype.destroyKeys = function() {
+  RocketEngine.prototype.destroyKeys = function() {
     var id, ids, _i, _len, _ref, _results;
     ids = 1 <= arguments.length ? __slice.call(arguments, 0) : [];
     _ref = _.flatten(ids);
@@ -6142,10 +6160,10 @@ Pocket = (function() {
   /*
   Deletes key entry and all component data about it.
   This operation is UNSAFE, prefer using {#destroyKey} which allows the
-  Pocket to delete keys at its earliest, safe convenience.
+  Rocket to delete keys at its earliest, safe convenience.
    */
 
-  Pocket.prototype.immediatelyDestroyKey = function(id) {
+  RocketEngine.prototype.immediatelyDestroyKey = function(id) {
     var cmp, name, _ref, _results;
     if (!this._keys[id]) {
       throw new Error("key with id " + id + " already destroyed");
@@ -6165,13 +6183,13 @@ Pocket = (function() {
 
 
   /*
-  Register a new named component type in the Pocket.
+  Register a new named component type in the Rocket.
   @param {String} name        name of component
   @param {Function, Object} initializer component initializer function
     `(component, options) -> void` or default options object
    */
 
-  Pocket.prototype.component = function(name, initializer) {
+  RocketEngine.prototype.component = function(name, initializer) {
     var defaults;
     if (_.isFunction(initializer)) {
 
@@ -6197,11 +6215,11 @@ Pocket = (function() {
 
   /*
   Convenience function to define several components at once.
-  @see Pocket::component
+  @see RocketEngine::component
   @param  {Object} components mapping of names to initializers
    */
 
-  Pocket.prototype.components = function(components) {
+  RocketEngine.prototype.components = function(components) {
     var initializer, name;
     for (name in components) {
       initializer = components[name];
@@ -6216,7 +6234,7 @@ Pocket = (function() {
   @return {Object} component state: mapping of keys to their component values
    */
 
-  Pocket.prototype.getComponent = function(name) {
+  RocketEngine.prototype.getComponent = function(name) {
     return this._components[name];
   };
 
@@ -6227,9 +6245,12 @@ Pocket = (function() {
   @return {Object} component state for its first key
    */
 
-  Pocket.prototype.getData = function(name) {
+  RocketEngine.prototype.getData = function(name) {
     var data;
     data = this._components[name];
+    if (data == null) {
+      throw new Error("No data found for " + name);
+    }
     return data[Object.keys(data)[0]];
   };
 
@@ -6242,7 +6263,7 @@ Pocket = (function() {
    - TODO: dataFor(key) constructs the entire data object? this would be expensive so be careful!
    */
 
-  Pocket.prototype.dataFor = function(key, name) {
+  RocketEngine.prototype.dataFor = function(key, name) {
     var _ref;
     return (_ref = this._components[name]) != null ? _ref[key] : void 0;
   };
@@ -6258,7 +6279,7 @@ Pocket = (function() {
   @param {Object} options       options for component initializer
    */
 
-  Pocket.prototype.addComponentToKey = function(id, componentName, options) {
+  RocketEngine.prototype.addComponentToKey = function(id, componentName, options) {
     var cmpEntry, cmpInitializer, component, _base;
     if (!this._keys[id]) {
       throw new Error("could not find key with id " + id);
@@ -6284,7 +6305,7 @@ Pocket = (function() {
   @return {Array<String>} array of matching key IDs
    */
 
-  Pocket.prototype.filterKeys = function() {
+  RocketEngine.prototype.filterKeys = function() {
     var componentArray, hasAll, id, matching, name, names, table0, _i, _len, _ref;
     componentArray = 1 <= arguments.length ? __slice.call(arguments, 0) : [];
     names = _.flatten(componentArray);
@@ -6314,15 +6335,15 @@ Pocket = (function() {
 
 
   /*
-  Register a new {System} in the Pocket.
+  Register a new {System} in the Rocket.
   @param  {String}        name name of the system
   @param  {Array<String>} reqs array of required component names
   @param  {Function}      fn   system action function, invoked with
-                               (pocket, keys[], cName1{}, ..., cNameN{})
+                               (rocket, keys[], cName1{}, ..., cNameN{})
   @return {System} new instance of System that was added.
    */
 
-  Pocket.prototype.system = function(name, reqs, fn) {
+  RocketEngine.prototype.system = function(name, reqs, fn) {
     var system;
     system = name instanceof System ? name : new System(name, reqs, fn);
     this._systems.push(system);
@@ -6331,16 +6352,16 @@ Pocket = (function() {
 
 
   /*
-  Register a new {System} in the Pocket that calls its function *for each* key
+  Register a new {System} in the Rocket that calls its function *for each* key
   that matches the requirements, to reduce boilerplate.
   @param {String}        name name of the system
   @param {Array<String>} reqs array of required component names
   @param {Function}      fn   system action function for each key, invoked with
-                              (pocket, key, cValue1, ..., cValueN)
+                              (rocket, key, cValue1, ..., cValueN)
   @return {System} new instance of System that was added.
    */
 
-  Pocket.prototype.systemForEach = function(name, reqs, fn) {
+  RocketEngine.prototype.systemForEach = function(name, reqs, fn) {
     return this.system(System.forEach(name, reqs, fn));
   };
 
@@ -6351,11 +6372,11 @@ Pocket = (function() {
   @return [Array<String>] array with all system names
    */
 
-  Pocket.prototype.getSystems = function() {
+  RocketEngine.prototype.getSystems = function() {
     return _.pluck(this._systems, 'name');
   };
 
-  Pocket.prototype._destroyMarkedKeys = function() {
+  RocketEngine.prototype._destroyMarkedKeys = function() {
     var key, _results;
     _results = [];
     for (key in this._keysToDestroy) {
@@ -6365,7 +6386,7 @@ Pocket = (function() {
     return _results;
   };
 
-  Pocket.prototype._runSystems = function() {
+  RocketEngine.prototype._runSystems = function() {
     var keys, reqs, system, _i, _len, _ref, _results;
     _ref = this._systems;
     _results = [];
@@ -6384,13 +6405,13 @@ Pocket = (function() {
 
 
   /*
-  Perform one tick of the Pocket environment: destroy marked keys and run all systems.
+  Perform one tick of the Rocket environment: destroy marked keys and run all systems.
   This function is intended to be wrapped in a `requestAnimationFrame` loop so it will
   be run every frame.
   @param {DOMHighResTimeStamp} time a timestamp from `requestAnimationFrame`
    */
 
-  Pocket.prototype.tick = function(time) {
+  RocketEngine.prototype.tick = function(time) {
     if (time != null) {
       this.delta = time - this.time;
       this.time = time;
@@ -6399,11 +6420,11 @@ Pocket = (function() {
     this._runSystems();
   };
 
-  return Pocket;
+  return RocketEngine;
 
 })();
 
-module.exports = Pocket;
+module.exports = RocketEngine;
 
 
 /*
@@ -6423,6 +6444,10 @@ var System, _,
 
 _ = require('./fn.coffee');
 
+
+/*
+ */
+
 module.exports = System = (function() {
 
   /*
@@ -6431,7 +6456,7 @@ module.exports = System = (function() {
   @param {String}        name               name of the system
   @param {Array<String>} requiredComponents array of required component names
   @param {Function}      action             system action function invoked with
-    `(pocket, keys, cValues1, ..., cValuesN)`
+    `(rocket, keys, cValues1, ..., cValuesN)`
    */
   function System(name, requiredComponents, action) {
     this.name = name;
@@ -6451,24 +6476,24 @@ module.exports = System = (function() {
 
   /*
   Creates a new system that runs the given function *for each* matched key. This helps to reduce
-  system boilerplate. This function is called internally by {Pocket#systemForEach}.
+  system boilerplate. This function is called internally by {Rocket#systemForEach}.
   @param {String}        name name of the system
   @param {Array<String>} reqs array of required component names
   @param {Function}      fn   system action function for each key, invoked with
-    `(pocket, key, cValue1, ..., cValueN)`
+    `(rocket, key, cValue1, ..., cValueN)`
   @return {System} new instance of System
    */
 
   System.forEach = function(name, reqs, fn) {
     var action;
     action = function() {
-      var components, key, keys, pocket, values, _i, _len, _results;
-      pocket = arguments[0], keys = arguments[1], components = 3 <= arguments.length ? __slice.call(arguments, 2) : [];
+      var components, key, keys, rocket, values, _i, _len, _results;
+      rocket = arguments[0], keys = arguments[1], components = 3 <= arguments.length ? __slice.call(arguments, 2) : [];
       _results = [];
       for (_i = 0, _len = keys.length; _i < _len; _i++) {
         key = keys[_i];
         values = _.pluck(components, key);
-        _results.push(fn.apply(null, [pocket, key].concat(__slice.call(values))));
+        _results.push(fn.apply(null, [rocket, key].concat(__slice.call(values))));
       }
       return _results;
     };
@@ -6499,16 +6524,16 @@ A `canvas-2d` component defines several keys:
 
 @example
    * require and register the component
-  pocket.component 'canvas-2d', require('pocket/utils/canvas-2d.coffee')
+  rocket.component 'canvas-2d', require('rocket-engine/utils/canvas-2d.coffee')
    * define a key with the canvas-2d component and your options
-  pocket.key {
+  rocket.key {
   	'canvas-2d':
       canvas: '#game'
       width : 'auto'
       height: 600
   }
-   * use pocket.getData in a system to get the component data and draw some graphics!
-  pocket.systemForEach 'draw-squares', ['position', 'square'], (p, k, {x, y}, {size, color}) ->
+   * use rocket.getData in a system to get the component data and draw some graphics!
+  rocket.systemForEach 'draw-squares', ['position', 'square'], (p, k, {x, y}, {size, color}) ->
   	{g2d} = p.getData 'canvas-2d'
   	g2d.fillStyle = color
   	g2d.fillRect x, y, size, size
@@ -6582,9 +6607,9 @@ check that the key is pressed `if cmp.down[keyName] isnt 0`.
 
 @example
    * register the keyboard-state component
-  pocket.component 'keyboard-state', require('pocket/utils/keyboard-state.coffee')
+  rocket.component 'keyboard-state', require('rocket-engine/utils/keyboard-state.coffee')
    * define a key with keymap for your game
-  pocket.key {
+  rocket.key {
     'keyboard-state':
       keymap:
         27: 'MENU'  # esc
@@ -6592,9 +6617,9 @@ check that the key is pressed `if cmp.down[keyName] isnt 0`.
         37: 'LEFT'  # left arrow
         39: 'RIGHT' # right arrow
   }
-   * call pocket.getData in a system to use the keyboard
-  pocket.systemForEach 'name', ['player'], (pocket, key, player) ->
-    keyboard = pocket.getData 'keyboard-state'
+   * call rocket.getData in a system to use the keyboard
+  rocket.systemForEach 'name', ['player'], (rocket, key, player) ->
+    keyboard = rocket.getData 'keyboard-state'
     player.shoot()  if keyboard.isNewPress 'SHOOT'
     player.move(-1) if keyboard.down.LEFT
     player.move(1)  if keyboard.down.RIGHT
@@ -6691,7 +6716,7 @@ module.exports = KeyboardState;
 
 
 },{}],43:[function(require,module,exports){
-var Canvas2D, Pocket, chai, expect;
+var Canvas2D, Rocket, chai, expect;
 
 chai = require('chai');
 
@@ -6703,24 +6728,24 @@ if (typeof document === "undefined" || document === null) {
 
 document.body.appendChild(document.createElement('canvas'));
 
-Pocket = require('../../src/pocket.coffee');
+Rocket = require('../../src/rocket.coffee');
 
 Canvas2D = require('../../src/utils/canvas-2d.coffee');
 
 describe('Canvas2D', function() {
-  var canvas, makeCanvas, pocket;
-  pocket = null;
+  var canvas, makeCanvas, rocket;
+  rocket = null;
   canvas = null;
   makeCanvas = function(options) {
     if (options == null) {
       options = null;
     }
-    pocket = new Pocket;
-    pocket.component('canvas-2d', Canvas2D);
-    pocket.key({
+    rocket = new Rocket;
+    rocket.component('canvas-2d', Canvas2D);
+    rocket.key({
       'canvas-2d': options
     });
-    canvas = pocket.getData('canvas-2d');
+    canvas = rocket.getData('canvas-2d');
     return canvas;
   };
   beforeEach(function() {
@@ -6764,8 +6789,8 @@ describe('Canvas2D', function() {
 
 
 
-},{"../../src/pocket.coffee":39,"../../src/utils/canvas-2d.coffee":41,"chai":6}],44:[function(require,module,exports){
-var Keyboard, Pocket, chai, expect;
+},{"../../src/rocket.coffee":39,"../../src/utils/canvas-2d.coffee":41,"chai":6}],44:[function(require,module,exports){
+var Keyboard, Rocket, chai, expect;
 
 chai = require('chai');
 
@@ -6775,24 +6800,24 @@ if (typeof document === "undefined" || document === null) {
   return;
 }
 
-Pocket = require('../../src/pocket.coffee');
+Rocket = require('../../src/rocket.coffee');
 
 Keyboard = require('../../src/utils/keyboard-state.coffee');
 
 describe('KeyboardState', function() {
-  var keyboard, makeKeyboard, pocket, triggerKeyEvent;
-  pocket = null;
+  var keyboard, makeKeyboard, rocket, triggerKeyEvent;
+  rocket = null;
   keyboard = null;
   makeKeyboard = function(options) {
     if (options == null) {
       options = null;
     }
-    pocket = new Pocket;
-    pocket.component('keyboard-state', Keyboard);
-    pocket.key({
+    rocket = new Rocket;
+    rocket.component('keyboard-state', Keyboard);
+    rocket.key({
       'keyboard-state': options
     });
-    keyboard = pocket.getData('keyboard-state');
+    keyboard = rocket.getData('keyboard-state');
     return keyboard;
   };
   triggerKeyEvent = function(type, key) {
@@ -6835,4 +6860,4 @@ describe('KeyboardState', function() {
 
 
 
-},{"../../src/pocket.coffee":39,"../../src/utils/keyboard-state.coffee":42,"chai":6}]},{},[1]);
+},{"../../src/rocket.coffee":39,"../../src/utils/keyboard-state.coffee":42,"chai":6}]},{},[1]);

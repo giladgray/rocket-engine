@@ -2,7 +2,7 @@
 <html>
   <head>
   <meta charset='UTF-8'>
-  <title>Pocket Documentation</title>
+  <title>Rocket Engine Documentation</title>
   <script src='../javascript/application.js'></script>
   <script src='../javascript/search.js'></script>
   <link rel='stylesheet' href='../stylesheets/application.css' type='text/css'>
@@ -11,8 +11,8 @@
     <div id='base' data-path='../'></div>
 <div id='header'>
   <div id='menu'>
-    <a href='../extra/README.md.html' title='Pocket'>
-      Pocket
+    <a href='../extra/README.md.html' title='Rocket Engine'>
+      Rocket Engine
     </a>
     &raquo;
     <a href='../alphabetical_index.html' title='Index'>
@@ -35,7 +35,7 @@
         <tr>
           <td>Inherits:</td>
           <td>
-            <a href='../class/System.html'>System</a>
+            System
           </td>
         </tr>
       </table>
@@ -50,8 +50,8 @@ to detect collisions or other interactions between keys.</p>
     <h4>
       
     </h4>
-    <pre><code class='coffeescript'>pocket.system PairSystem.forEach &#39;a-b&#39;, [&#39;letter&#39;], [&#39;number&#39;],
-  (pocket, [keyA, letter], [keyB, number]) -&gt;
+    <pre><code class='coffeescript'>rocket.system PairSystem.forEach &#39;a-b&#39;, [&#39;letter&#39;], [&#39;number&#39;],
+  (rocket, [keyA, letter], [keyB, number]) -&gt;
     # function is called for each pair of [letter key, number key]</code></pre>
   </div>
 </div>
@@ -79,23 +79,13 @@ to detect collisions or other interactions between keys.</p>
       <a href='#action-dynamic'>
         #
 (void)
-<b>action</b><span>(pocket, keysA, reqsA...)</span>
+<b>action</b><span>(rocket, keysA, reqsA...)</span>
       </a>
     </span>
     <span class='desc'>
     </span>
   </li>
 </ul>
-      <h2>
-        <small>Inherited Method Summary</small>
-        <h3 class='inherited'>
-          Methods inherited from
-          <a href='../class/System.html'>System</a>
-        </h3>
-        <p class='inherited'>
-          <a href='../class/System.html#forEach-static'>.forEach</a>
-        </p>
-      </h2>
       <h2>Class Method Details</h2>
       <div class='methods'>
   <div class='method_details'>
@@ -165,7 +155,7 @@ to detect collisions or other interactions between keys.</p>
         )
       </span>
       &mdash;
-      <span class='desc'>pair system action function invoked with <code>(pocket, [keysA, compA1, ...compAN], [keysB, compB1, ...compBN)</code> </span>
+      <span class='desc'>pair system action function invoked with <code>(rocket, [keysA, compA1, ...compAN], [keysB, compB1, ...compBN)</code> </span>
     </li>
   </ul>
 </div>
@@ -177,7 +167,7 @@ to detect collisions or other interactions between keys.</p>
     <p class='signature' id='action-dynamic'>
       #
 (void)
-<b>action</b><span>(pocket, keysA, reqsA...)</span>
+<b>action</b><span>(rocket, keysA, reqsA...)</span>
       <br>
     </p>
     
@@ -185,7 +175,7 @@ to detect collisions or other interactions between keys.</p>
 </div>
     </div>
     <div id='footer'>
-  November 23, 14 14:02:03 by
+  November 26, 14 23:36:10 by
   <a href='https://github.com/coffeedoc/codo' title='CoffeeScript API documentation generator'>
     Codo
   </a>

@@ -1,108 +1,351 @@
-(function() {
-  var GRAVITY, pocket, start;
+(function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
+var GRAVITY, Vector, canvas, rocket, start;
 
-  pocket = new Pocket;
+Vector = require('../../src/utils/vector.coffee');
 
-  pocket.component('context-2d', function(cmp, options) {
-    var resize;
-    cmp.canvas = document.querySelector(options.canvas || '#canvas');
-    cmp.g2d = cmp.canvas.getContext('2d');
-    cmp.center = {
-      x: 0,
-      y: 0
-    };
-    window.addEventListener('resize', resize = function() {
-      cmp.canvas.width = document.body.clientWidth;
-      cmp.canvas.height = document.body.clientHeight;
-      cmp.width = cmp.canvas.width;
-      cmp.height = cmp.canvas.height;
-      cmp.center.x = cmp.canvas.width / 2;
-      return cmp.center.y = cmp.canvas.height / 2;
-    });
-    return resize();
-  });
+rocket = new Rocket;
 
-  pocket.key({
-    'context-2d': null
-  });
+rocket.component('canvas', require('../../src/utils/canvas-2d.coffee'));
 
-  pocket.component('position', {
-    x: 0,
-    y: 0
-  });
+rocket.key({
+  canvas: {
+    width: 'auto',
+    height: 'auto'
+  }
+});
 
-  pocket.component('velocity', {
-    x: 0,
-    y: 0
-  });
+canvas = rocket.getData('canvas');
 
-  pocket.component('circle', {
-    radius: 30,
-    color: 'red'
-  });
+rocket.component('position', Vector["new"]());
 
-  pocket.key({
-    position: {
-      x: 30,
-      y: 50
-    },
-    velocity: {
-      x: 5,
-      y: 0
-    },
-    circle: null
-  });
+rocket.component('velocity', Vector["new"]());
 
-  GRAVITY = 1.0;
+rocket.component('circle', {
+  radius: 30,
+  color: 'red'
+});
 
-  pocket.systemForEach('gravity', ['velocity'], function(pocket, key, vel) {
-    return vel.y += GRAVITY;
-  });
+rocket.key({
+  position: Vector["new"](30, 50),
+  velocity: Vector["new"](5, 0),
+  circle: null
+});
 
-  pocket.systemForEach('move', ['position', 'velocity'], function(pocket, key, pos, vel) {
+GRAVITY = Vector["new"](0, 1.0);
+
+rocket.systemForEach('gravity', ['velocity'], function(rocket, key, vel) {
+  return Vector.add(vel, GRAVITY);
+});
+
+rocket.systemForEach('move', ['position', 'velocity'], function(rocket, key, pos, vel) {
+  return Vector.add(pos, vel);
+});
+
+rocket.system('clear-canvas', [], function(rocket) {
+  var g2d, height, width;
+  g2d = canvas.g2d, width = canvas.width, height = canvas.height;
+  return g2d.clearRect(0, 0, width, height);
+});
+
+rocket.systemForEach('draw-ball', ['position', 'circle'], function(rocket, key, pos, circle) {
+  var g2d;
+  g2d = canvas.g2d;
+  g2d.beginPath();
+  g2d.fillStyle = circle.color;
+  g2d.arc(pos.x, pos.y, circle.radius, 0, Math.PI * 2);
+  g2d.closePath();
+  return g2d.fill();
+});
+
+rocket.systemForEach('bounce', ['position', 'velocity', 'circle'], function(pkt, key, pos, vel, _arg) {
+  var height, radius, width;
+  radius = _arg.radius;
+  width = canvas.width, height = canvas.height;
+  if (pos.x < radius || pos.x > width - radius) {
+    vel.x *= -1;
     pos.x += vel.x;
+  }
+  if (pos.y < radius || pos.y > height - radius) {
+    vel.y *= -1;
     return pos.y += vel.y;
-  });
+  }
+});
 
-  pocket.system('clear-canvas', [], function(pocket) {
-    var g2d, height, width, _ref;
-    _ref = pocket.getData('context-2d'), g2d = _ref.g2d, width = _ref.width, height = _ref.height;
-    return g2d.clearRect(0, 0, width, height);
-  });
+start = function(time) {
+  rocket.tick(time);
+  return window.requestAnimationFrame(start);
+};
 
-  pocket.systemForEach('draw-ball', ['position', 'circle'], function(pocket, key, pos, circle) {
-    var g2d;
-    g2d = pocket.getData('context-2d').g2d;
-    g2d.beginPath();
-    g2d.fillStyle = circle.color;
-    g2d.arc(pos.x, pos.y, circle.radius, 0, Math.PI * 2);
-    g2d.closePath();
-    return g2d.fill();
-  });
+document.addEventListener('DOMContentLoaded', function() {
+  return start();
+});
 
-  pocket.systemForEach('bounce', ['position', 'velocity', 'circle'], function(pkt, key, pos, vel, _arg) {
-    var height, radius, width, _ref;
-    radius = _arg.radius;
-    _ref = pkt.getData('context-2d'), width = _ref.width, height = _ref.height;
-    if (pos.x < radius || pos.x > width - radius) {
-      vel.x *= -1;
-      pos.x += vel.x;
+
+
+},{"../../src/utils/canvas-2d.coffee":2,"../../src/utils/vector.coffee":3}],2:[function(require,module,exports){
+
+/*
+A component definition for a 2D canvas graphics provider. Given a selector for a canvas element,
+stores a reference to the CanvasRenderingContext2D, its width and height, and a center vector.
+Automatically updates canvas size if one or both dimensions are set to 'auto'.
+
+A `canvas-2d` component defines several keys:
+- **`canvas`** - the canvas element that is being rendered to
+- **`width`** - the width of the canvas, in pixels
+- **`height`** - the height of the canvas, in pixels
+- **`g2d`** - a CanvasRenderingContext2D graphics drawing surface
+- **`camera`** - a 2D vector representing the location of the 'camera'. the component does not
+  actually use this value, but instead provides it in a central place for your
+  game to modify and for your rendering systems to use.
+
+@example
+   * require and register the component
+  rocket.component 'canvas-2d', require('rocket-engine/utils/canvas-2d.coffee')
+   * define a key with the canvas-2d component and your options
+  rocket.key {
+  	'canvas-2d':
+      canvas: '#game'
+      width : 'auto'
+      height: 600
+  }
+   * use rocket.getData in a system to get the component data and draw some graphics!
+  rocket.systemForEach 'draw-squares', ['position', 'square'], (p, k, {x, y}, {size, color}) ->
+  	{g2d} = p.getData 'canvas-2d'
+  	g2d.fillStyle = color
+  	g2d.fillRect x, y, size, size
+
+@param {Object}       cmp    component entry
+@param {String}       canvas CSS selector for canvas element (default: `'#canvas'`)
+@param {Integer|auto} width  width of canvas element, or 'auto' to match window width
+  (default: `'auto'`)
+@param {Integer|auto} height height of canvas element, or 'auto' to match window height
+  (default: `'auto'`)
+ */
+var Canvas2D;
+
+Canvas2D = function(cmp, _arg) {
+  var autoWidth, autoheight, canvas, height, resize, width;
+  canvas = _arg.canvas, width = _arg.width, height = _arg.height;
+  autoWidth = width === 'auto';
+  autoheight = height === 'auto';
+  cmp.canvas = document.querySelector(canvas || 'canvas');
+  cmp.g2d = cmp.canvas.getContext('2d');
+  cmp.camera = {
+    x: 0,
+    y: 0
+  };
+  cmp.pointShape = function(points) {
+    var i, pt, _i, _len;
+    for (i = _i = 0, _len = points.length; _i < _len; i = ++_i) {
+      pt = points[i];
+      if (i === 0) {
+        cmp.g2d.moveTo(pt.x, pt.y);
+      } else {
+        cmp.g2d.lineTo(pt.x, pt.y);
+      }
     }
-    if (pos.y < radius || pos.y > height - radius) {
-      vel.y *= -1;
-      return pos.y += vel.y;
-    }
+    return cmp.g2d.lineTo(points[0].x, points[0].y);
+  };
+  window.addEventListener('resize', resize = function() {
+    cmp.width = cmp.canvas.width = autoWidth ? document.body.clientWidth : width;
+    return cmp.height = cmp.canvas.height = autoheight ? document.body.clientHeight : height;
   });
+  return resize();
+};
 
-  start = function(time) {
-    pocket.tick(time);
-    return window.requestAnimationFrame(start);
+module.exports = Canvas2D;
+
+
+
+},{}],3:[function(require,module,exports){
+
+/*
+A static 2-dimensional Vector operations library.
+
+A vector is simply a regular object with keys `{x, y}`. `Vector.new(x, y)` is shorthand for creating
+this object, but you can easily do it yourself too.
+
+All vector operations operate on one or two vectors. `equal`, `angle`, `distSq`, and `dist`
+return scalar values and leave the vector unchanged. `add`, `sub`, `scale`, and `invert` will
+by default mutate the components of the first vector argument and return it. if the final `clone`
+argument is set to `true` on these operations then they will return a *new* vector object with
+final component values.
+
+All functions on this class are static and the constructor should never be used.
+
+@example
+  v1 = Vector.new(10, 20)
+  v2 = {x: 1, y: 2}
+
+   * add in place
+  v3 = Vector.add(v1, v2)
+   * -> v1 == (11, 22); v3 === v1
+
+   * add and clone
+  v4 = Vector.add(v1, v2, true)
+   * -> v4 == (12, 24); v4 !== v1
+ */
+var Vector;
+
+module.exports = Vector = (function() {
+  var normalize;
+
+  function Vector() {
+    throw new Error('Vector: static class, do not use constructor');
+  }
+
+  normalize = function(num) {
+    if (Math.abs(num) < 1e-10) {
+      return 0;
+    } else {
+      return num;
+    }
   };
 
-  document.addEventListener('DOMContentLoaded', function() {
-    return start();
-  });
 
-}).call(this);
+  /*
+  Create a new Vector. A vector is simply an object with keys `{x,y}`. This method is provided
+  as shorthand and allows for default and optional parameters.
+  @param x [Number] x coordinate of vector
+  @param y [Number] y coordinate of vector
+   */
 
-//# sourceMappingURL=data:application/json;base64,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QVksSUFBWixDQUFBLENBQUE7V0FDQSxNQUFNLENBQUMscUJBQVAsQ0FBNkIsS0FBN0IsRUFGTTtFQUFBLENBbkVSLENBQUE7O0FBQUEsRUF1RUEsUUFBUSxDQUFDLGdCQUFULENBQTBCLGtCQUExQixFQUE4QyxTQUFBLEdBQUE7V0FBRyxLQUFBLENBQUEsRUFBSDtFQUFBLENBQTlDLENBdkVBLENBQUE7QUFBQSIsImZpbGUiOiJib3VuY2UvYm91bmNlLmpzIiwic291cmNlUm9vdCI6Ii9zb3VyY2UvIiwic291cmNlc0NvbnRlbnQiOlsicG9ja2V0ID0gbmV3IFBvY2tldFxuXG4jIGNvbnRleHQtMmQgY29tcG9uZW50IGZvciBzdG9yaW5nIENhbnZhc1JlbmRlcmluZ0NvbnRleHQyRCBhbmQgb3RoZXIgY2FudmFzIGluZm9cbnBvY2tldC5jb21wb25lbnQgJ2NvbnRleHQtMmQnLCAoY21wLCBvcHRpb25zKSAtPlxuICBjbXAuY2FudmFzID0gZG9jdW1lbnQucXVlcnlTZWxlY3RvciBvcHRpb25zLmNhbnZhcyBvciAnI2NhbnZhcydcbiAgY21wLmcyZCA9IGNtcC5jYW52YXMuZ2V0Q29udGV4dCgnMmQnKVxuICBjbXAuY2VudGVyID0ge3g6IDAsIHk6IDB9XG5cbiAgIyBlbnN1cmUgY2FudmFzIGlzIGFzIGxhcmdlIGFzIHBvc3NpYmxlXG4gIHdpbmRvdy5hZGRFdmVudExpc3RlbmVyICdyZXNpemUnLCByZXNpemUgPSAtPlxuICAgIGNtcC5jYW52YXMud2lkdGggPSBkb2N1bWVudC5ib2R5LmNsaWVudFdpZHRoXG4gICAgY21wLmNhbnZhcy5oZWlnaHQgPSBkb2N1bWVudC5ib2R5LmNsaWVudEhlaWdodFxuICAgIGNtcC53aWR0aCA9IGNtcC5jYW52YXMud2lkdGhcbiAgICBjbXAuaGVpZ2h0ID0gY21wLmNhbnZhcy5oZWlnaHRcbiAgICBjbXAuY2VudGVyLnggPSBjbXAuY2FudmFzLndpZHRoIC8gMlxuICAgIGNtcC5jZW50ZXIueSA9IGNtcC5jYW52YXMuaGVpZ2h0IC8gMlxuICByZXNpemUoKVxuXG4jIHRoZSBjb250ZXh0LTJkIGRhdGEgb2JqZWN0XG5wb2NrZXQua2V5IHsnY29udGV4dC0yZCc6IG51bGx9XG5cbiMgYmFsbCBjb21wb25lbnRzXG5wb2NrZXQuY29tcG9uZW50ICdwb3NpdGlvbicsIHt4OiAwLCB5OiAwfVxucG9ja2V0LmNvbXBvbmVudCAndmVsb2NpdHknLCB7eDogMCwgeTogMH1cbnBvY2tldC5jb21wb25lbnQgJ2NpcmNsZScsICAge3JhZGl1czogMzAsIGNvbG9yOiAncmVkJ31cblxuIyB0aGUgYmFsbCFcbnBvY2tldC5rZXlcbiAgcG9zaXRpb24gOiB7eDogMzAsIHk6IDUwfVxuICB2ZWxvY2l0eSA6IHt4OiA1LCB5OiAwfVxuICBjaXJjbGUgICA6IG51bGxcblxuIyBhcHBseSBncmF2aXR5IHRvIGV2ZXJ5IHRoaW5nIHdpdGggYSB2ZWxvY2l0eVxuR1JBVklUWSA9IDEuMFxucG9ja2V0LnN5c3RlbUZvckVhY2ggJ2dyYXZpdHknLCBbJ3ZlbG9jaXR5J10sIChwb2NrZXQsIGtleSwgdmVsKSAtPlxuICB2ZWwueSArPSBHUkFWSVRZXG5cbiMgbW92ZSBlYWNoIGJhbGxcbnBvY2tldC5zeXN0ZW1Gb3JFYWNoICdtb3ZlJywgWydwb3NpdGlvbicsICd2ZWxvY2l0eSddLCAocG9ja2V0LCBrZXksIHBvcywgdmVsKSAtPlxuICBwb3MueCArPSB2ZWwueFxuICBwb3MueSArPSB2ZWwueVxuXG4jIGNsZWFyIHRoZSBjYW52YXMgZWFjaCBmcmFtZVxucG9ja2V0LnN5c3RlbSAnY2xlYXItY2FudmFzJywgW10sIChwb2NrZXQpIC0+XG4gIHtnMmQsIHdpZHRoLCBoZWlnaHR9ID0gcG9ja2V0LmdldERhdGEgJ2NvbnRleHQtMmQnXG4gIGcyZC5jbGVhclJlY3QgMCwgMCwgd2lkdGgsIGhlaWdodFxuXG4jIGRyYXcgZWFjaCBiYWxsc1xucG9ja2V0LnN5c3RlbUZvckVhY2ggJ2RyYXctYmFsbCcsIFsncG9zaXRpb24nLCAnY2lyY2xlJ10sIChwb2NrZXQsIGtleSwgcG9zLCBjaXJjbGUpIC0+XG4gIHtnMmR9ID0gcG9ja2V0LmdldERhdGEgJ2NvbnRleHQtMmQnXG4gIGcyZC5iZWdpblBhdGgoKVxuICBnMmQuZmlsbFN0eWxlID0gY2lyY2xlLmNvbG9yXG4gIGcyZC5hcmMgcG9zLngsIHBvcy55LCBjaXJjbGUucmFkaXVzLCAwLCBNYXRoLlBJICogMlxuICBnMmQuY2xvc2VQYXRoKClcbiAgZzJkLmZpbGwoKVxuXG4jIGJvdW5jZSBlYWNoIGJhbGwgd2hlbiB0aGV5IHJlYWNoIHRoZSBlZGdlIG9mIHRoZSBjYW52YXNcbnBvY2tldC5zeXN0ZW1Gb3JFYWNoICdib3VuY2UnLCBbJ3Bvc2l0aW9uJywgJ3ZlbG9jaXR5JywgJ2NpcmNsZSddLCAocGt0LCBrZXksIHBvcywgdmVsLCB7cmFkaXVzfSkgLT5cbiAge3dpZHRoLCBoZWlnaHR9ID0gcGt0LmdldERhdGEgJ2NvbnRleHQtMmQnXG4gIGlmIHBvcy54IDwgcmFkaXVzIG9yIHBvcy54ID4gd2lkdGggLSByYWRpdXNcbiAgICB2ZWwueCAqPSAtMVxuICAgIHBvcy54ICs9IHZlbC54XG4gIGlmIHBvcy55IDwgcmFkaXVzIG9yIHBvcy55ID4gaGVpZ2h0IC0gcmFkaXVzXG4gICAgdmVsLnkgKj0gLTFcbiAgICBwb3MueSArPSB2ZWwueVxuXG4jIHJlbmRlciBsb29wXG5zdGFydCA9ICh0aW1lKSAtPlxuICBwb2NrZXQudGljayh0aW1lKVxuICB3aW5kb3cucmVxdWVzdEFuaW1hdGlvbkZyYW1lIHN0YXJ0XG5cbmRvY3VtZW50LmFkZEV2ZW50TGlzdGVuZXIgJ0RPTUNvbnRlbnRMb2FkZWQnLCAtPiBzdGFydCgpXG4iXX0=
+  Vector["new"] = function(x, y) {
+    if (x == null) {
+      x = 0;
+    }
+    if (y == null) {
+      y = 0;
+    }
+    return {
+      x: x,
+      y: y
+    };
+  };
+
+
+  /*
+  Create a new Vector from polar coordinates `(r,θ)`.
+  @param radius [Number] polar radius
+  @param angle [Number] polar angle in radians
+  @return [Vector] new vector with `{x,y}` coordinates.
+   */
+
+  Vector.fromPolar = function(radius, angle) {
+    return Vector["new"](normalize(radius * Math.cos(angle)), normalize(radius * Math.sin(angle)));
+  };
+
+  Vector.clone = function(v) {
+    return {
+      x: v.x,
+      y: v.y
+    };
+  };
+
+  Vector.equal = function(v1, v2) {
+    return v1.x === v2.x && v1.y === v2.y;
+  };
+
+
+  /*
+  Adds two vectors, modifiying the first one and returning the resulting vector.  If `clone=true`
+  then `v1` is first cloned and this new Vector with the added components is returned.
+  @param v1 [Vector] first vector
+  @param v2 [Vector] second vector
+  @param clone [Boolean] whether to clone the first vector before modifying components
+  @return [Vector] vector with added components
+   */
+
+  Vector.add = function(v1, v2, clone) {
+    if (clone == null) {
+      clone = false;
+    }
+    if (clone) {
+      v1 = Vector.clone(v1);
+    }
+    v1.x += v2.x;
+    v1.y += v2.y;
+    return v1;
+  };
+
+
+  /*
+  Subtracts two vectors, modifiying the first one and returning the resulting vector.  If
+  `clone=true` then `v1` is first cloned and this new Vector with the subtracted components is
+  returned.
+  @param v1 [Vector] first vector
+  @param v2 [Vector] second vector
+  @param clone [Boolean] whether to clone the first vector before modifying components
+  @return [Vector] vector with subtracted components
+   */
+
+  Vector.sub = function(v1, v2, clone) {
+    if (clone == null) {
+      clone = false;
+    }
+    if (clone) {
+      v1 = Vector.clone(v1);
+    }
+    v1.x -= v2.x;
+    v1.y -= v2.y;
+    return v1;
+  };
+
+
+  /*
+  Scales a vector by the given factor, modifiying it and returning the resulting vector.  If
+  `clone=true` then `v` is first cloned and this new Vector with the scaled components is returned.
+  @param v [Vector] vector
+  @param factor [Number] amount to scale each component by
+  @param clone [Boolean] whether to clone the first vector before modifying components
+  @return [Vector] vector with scaled components
+   */
+
+  Vector.scale = function(v, factor, clone) {
+    if (clone == null) {
+      clone = false;
+    }
+    if (clone) {
+      v = Vector.clone(v);
+    }
+    v.x *= factor;
+    v.y *= factor;
+    return v;
+  };
+
+
+  /*
+  Scales a vector by -1 so it points in the opposite direction, modifiying it and returning the
+  resulting vector.  If `clone=true` then `v` is first cloned and this new Vector with the inverted
+  components is returned.
+  @param v [Vector] vector
+  @param clone [Boolean] whether to clone the first vector before modifying components
+  @return [Vector] vector with inverted components
+   */
+
+  Vector.invert = function(v, clone) {
+    if (clone == null) {
+      clone = false;
+    }
+    return Vector.scale(v, -1, clone);
+  };
+
+  Vector.angle = function(v) {
+    return Math.atan2(v.y, v.x);
+  };
+
+  Vector.distSq = function(v) {
+    return v.x * v.x + v.y * v.y;
+  };
+
+  Vector.dist = function(v) {
+    return Math.sqrt(Vector.distSq(v));
+  };
+
+  return Vector;
+
+})();
+
+
+
+},{}]},{},[1]);
