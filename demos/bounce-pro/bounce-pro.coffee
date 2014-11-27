@@ -1,10 +1,5 @@
+fn = require '../../src/fn.coffee'
 Vector = require '../../src/utils/vector.coffee'
-
-random = (min, max) ->
-  unless max?
-    max = min
-    min = 0
-  return Math.floor(Math.random() * (max - min)) + min
 
 # track number of balls on the screen
 numBalls = 0
@@ -55,13 +50,13 @@ nextColor = ->
 randomBall = ->
   updateCount(1)
   {width, height} = canvas
-  radius = random(20, 100)
+  radius = fn.random(20, 100)
   rocket.key {
     ball: true
     position :
-      x: random(radius, width - radius)
-      y: random(radius, height / 2 - radius)
-    velocity : {x: random(-8, 8), y: 0}
+      x: fn.random(radius, width - radius)
+      y: fn.random(radius, height / 2 - radius)
+    velocity : {x: fn.random(-8, 8), y: 0}
     circle   : {radius, color: nextColor()}
   }
 
@@ -71,14 +66,13 @@ randomBall() for i in [0...5]
 ### NOW IT'S IDENTICAL TO BOUNCE! DEMO ###
 
 # apply gravity to every thing with a velocity
-GRAVITY = 0.5
+GRAVITY = Vector.new(0, 0.5)
 rocket.systemForEach 'gravity', ['velocity'], (rocket, key, vel) ->
-  vel.y += GRAVITY
+  Vector.add vel, GRAVITY
 
 # move each ball
 rocket.systemForEach 'move', ['position', 'velocity'], (rocket, key, pos, vel) ->
-  pos.x += vel.x
-  pos.y += vel.y
+  Vector.add pos, vel
 
 # clear the canvas each frame
 rocket.system 'clear-canvas', [], (rocket) ->

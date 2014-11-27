@@ -20,9 +20,9 @@ rocket.key
   circle   : null
 
 # apply gravity to every thing with a velocity
-GRAVITY = 1.0
+GRAVITY = Vector.new(0, 1.0)
 rocket.systemForEach 'gravity', ['velocity'], (rocket, key, vel) ->
-  vel.y += GRAVITY
+  Vector.add vel, GRAVITY
 
 # move each ball
 rocket.systemForEach 'move', ['position', 'velocity'], (rocket, key, pos, vel) ->

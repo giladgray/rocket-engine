@@ -1,12 +1,7 @@
+fn = require '../../src/fn.coffee'
 Vector = require '../../src/utils/vector.coffee'
 Rectangle = require '../../src/utils/rectangle.coffee'
 Keeper = require '../../src/utils/score-keeper.coffee'
-
-random = (min, max) ->
-  unless max?
-    max = min
-    min = 0
-  return Math.floor(Math.random() * (max - min)) + min
 
 rocket = new Rocket
 
@@ -53,20 +48,20 @@ rocket.player = rocket.key
 level = -1
 lastBarrierX = ctx.center.x
 addLevel = ->
-  barrier = {x: ctx.center.x + random(-150, 150), y: 100 - BARRIER_DISTANCE * level++}
+  barrier = {x: ctx.center.x + fn.random(-150, 150), y: 100 - BARRIER_DISTANCE * level++}
   squareX = (barrier.x + lastBarrierX) / 2 + BARRIER_WIDTH / 2
   rocket.key {evil: true, barrier}
   rocket.key
     evil: true
     square: null
     position:
-      x: squareX + random(-BARRIER_WIDTH / 2, BARRIER_WIDTH / 2)
+      x: squareX + fn.random(-BARRIER_WIDTH / 2, BARRIER_WIDTH / 2)
       y: barrier.y - BARRIER_DISTANCE * 2 / 3
   rocket.key
     evil: true
     square: null
     position:
-      x: squareX + random(-BARRIER_WIDTH / 2, BARRIER_WIDTH / 2)
+      x: squareX + fn.random(-BARRIER_WIDTH / 2, BARRIER_WIDTH / 2)
       y: barrier.y - BARRIER_DISTANCE / 3
   lastBarrierX = barrier.x
 addLevel() for i in [1..3]
@@ -78,14 +73,14 @@ rocket.system 'level-barrier', ['barrier', 'evil'], (rocket, keys, barriers) ->
   for key in keys
     barrier = barriers[key]
     continue if barrier.marked?
-    if Rectangle.overlap playerRect, Rectangle.new(barrier.x, barrier.y, barrier.gapWidth, barrier.height)
-      barrier.color = 'green'
-      barrier.marked = true
     if Rectangle.overlap playerRect, Rectangle.new(0, barrier.y, ctx.width, barrier.height)
       barrier.color = 'red'
       barrier.marked = false
+    if Rectangle.overlap playerRect, Rectangle.new(barrier.x, barrier.y, barrier.gapWidth, barrier.height)
+      barrier.color = 'green'
+      barrier.marked = true
+      rocket.score.addPoints 1
     if barrier.marked is false then rocket.score.reset()
-    else rocket.score.addPoints 1
 
 rocket.system 'square-smash', ['position', 'square', 'evil'], (rocket, keys, positions, squares) ->
   pPos = rocket.dataFor rocket.player, 'position'

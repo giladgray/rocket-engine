@@ -59,6 +59,20 @@ class Fn
         Object::toString.call(val) is objectTypes[type]
 
   ###
+  Returns a random integer between `[min, max)`: from `min` (inclusive) up to but
+  not including `max` (exclusive). If only one argument `max` is provided, the range
+  becomes `[0, max)`. Uses `Math.random()` internally.
+  @param min [Number] minimum value, inclusive; defaults to 0 if omitted
+  @param max [Number] maximum value, exclusive
+  @return [Number] random integer between `min` and `max`
+  ###
+  @random: (min, max) ->
+    unless max?
+      max = min
+      min = 0
+    return Math.floor(Math.random() * (max - min)) + min
+
+  ###
   Flattens a nested array (the nesting can be to any depth). Accepts a single array or splat of
   mixed types.
   @param arrays [Array...] a single array of splat of values to flatten

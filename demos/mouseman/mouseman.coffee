@@ -1,12 +1,7 @@
+fn        = require '../../src/fn.coffee'
 Vector    = require '../../src/utils/vector.coffee'
 Rectangle = require '../../src/utils/rectangle.coffee'
 Keeper    = require '../../src/utils/score-keeper.coffee'
-
-random = (min, max) ->
-  unless max?
-    max = min
-    min = 0
-  return Math.floor(Math.random() * (max - min)) + min
 
 rocket = new Rocket
 
@@ -41,8 +36,8 @@ newBall = ->
   mouseFuel = MAX_FUEL
   rocket.key
     position:
-      x: random canvas.width
-      y: random canvas.height
+      x: fn.random canvas.width
+      y: fn.random canvas.height
     speed: null
     circle: null
 newBall()
