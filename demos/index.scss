@@ -4,7 +4,6 @@ $link-color: purple;
 
 body {
   font-family: 'Oswald', sans-serif;
-  text-align: center;
   margin: 0;
 
   &.demo {
@@ -21,6 +20,7 @@ header, footer {
   background: #23241f; // monokai_sublime bg color
   padding: 3em 0;
   color: white;
+  text-align: center;
 }
 
 footer {
@@ -42,6 +42,7 @@ article {
 
 #demos {
   margin: -1.5em auto 3em;
+  text-align: center;
 }
 
 h1 {
@@ -137,8 +138,17 @@ a {
   right: 0;
   padding: 1em;
 
-  .title { float: left; }
-  .view-source { float: right; }
+  .view-source {
+    float: right;
+    line-height: 2em;
+  }
+
+  img {
+    height: 2em;
+    vertical-align: middle;
+  }
+
+  strong { font-size: 1.3em; }
 }
 
 .scores {
