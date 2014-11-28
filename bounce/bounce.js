@@ -26,7 +26,7 @@ rocket.component('circle', {
 });
 
 rocket.key({
-  position: Vector["new"](30, 50),
+  position: Vector["new"](30, 100),
   velocity: Vector["new"](5, 0),
   circle: null
 });
