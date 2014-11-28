@@ -15,7 +15,7 @@ rocket.component 'circle',   {radius: 30, color: 'red'}
 
 # the ball!
 rocket.key
-  position : Vector.new(30, 50)
+  position : Vector.new(30, 100)
   velocity : Vector.new(5, 0)
   circle   : null
 
