@@ -1,19 +1,35 @@
 <html>
   <head>
-    <title>Rocket.js</title>
+    <title>Rocket Engine</title>
     <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.4/styles/monokai_sublime.min.css">
     <link rel="stylesheet" href="index.css" media="screen" charset="utf-8">
   </head>
   <body>
-    <h1>Rocket.js</h1>
-    <h3>A little game engine that'll take you over the moon.</h3>
-    <ul>
-      <li><a href="https://github.com/giladgray/rocket-engine">Source on GitHub</a></li>
-      <li><a href="docs">Documentation</a></li>
-    </ul>
+    <header>
+      <article id="title">
+        <h1>
+          rocket.js
+          <img id="logo" src="rocket_icon.svg" alt="rocket icon" />
+        </h1>
+        <h3>a little game engine that'll take you over the moon</h3>
+        <ul>
+          <li><a href="https://github.com/giladgray/rocket-engine">Source on GitHub</a></li>
+          <li><a href="docs">Documentation</a></li>
+        </ul>
+      </article>
+    </header>
 
-    <pre>
-      <code class="coffeescript">Rocket = require 'rocket-engine'
+    <article id="hook">
+      <p>
+        A <em>component-entity system</em> with a library of game utilities makes building
+        <em>data-driven games</em> a snap! Game logic is decomposed into simple systems each
+        responsible for <em>one moving piece</em>. Adding or swapping features is a breeze.
+      </p>
+    </article>
+
+    <article id="example">
+      <pre>
+        <code class="coffeescript">Rocket = require 'rocket-engine'
 
 rocket = new Rocket
 
@@ -38,19 +54,27 @@ rocket.key {
   velocity  : null # use default component values
   position  : {x: WIDTH / 2, y: HEIGHT / 2}
 }</code>
-    </pre>
+      </pre>
+    </article>
 
-    <h2>Demos</h2>
-    <ul>
-      <li><a href="bounce">Bounce!</a></li>
-      <li><a href="bounce-pro">Bounce! PRO</a></li>
-      <li><a href="jumper">Jumper</a></li>
-      <li><a href="mouseman">Mouseman</a></li>
-    </ul>
 
-    <small class="byline">
-      &copy; Gilad Gray, 2014
-    </small>
+    <article id="demos">
+      <h2>See it in action:</h2>
+      <ul>
+        <li><a href="bounce">Bounce!</a></li>
+        <li><a href="bounce-pro">Bounce! PRO</a></li>
+        <li><a href="jumper">Jumper</a></li>
+        <li><a href="mouseman">Mouseman</a></li>
+      </ul>
+    </article>
+
+    <footer>
+      &copy; Gilad Gray, 2014.
+      &nbsp;&nbsp;
+      Rocket designed by <a href="http://www.thenounproject.com/misirlou">misirlou</a> from the <a href="http://www.thenounproject.com">Noun Project</a>.
+
+      <img src="rocket_icon.svg" alt="" class="logo pull-right">
+    </footer>
 
     <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.4/highlight.min.js"></script>
     <script>hljs.initHighlightingOnLoad();</script>

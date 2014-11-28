@@ -1,25 +1,92 @@
-body {
-  font-family: sans-serif;
-  text-align: center;
-  margin: 1em;
+@import url(http://fonts.googleapis.com/css?family=PT+Mono|Oswald:400,700);
 
-  &.demo { margin: 0; }
+$link-color: purple;
+
+body {
+  font-family: 'Oswald', sans-serif;
+  text-align: center;
+  margin: 0;
+
+  &.demo {
+    user-select: none;
+  }
+}
+
+.container {
+  max-width: 40em;
+  margin: 1em auto;
+}
+
+header, footer {
+  background: #23241f; // monokai_sublime bg color
+  padding: 3em 0;
+  color: white;
+}
+
+footer {
+  font-size: 14px;
+  padding: 2em 2em;
+  position: relative;
+
+  img {
+    height: 4em;
+    position: absolute;
+    right: 2em;
+    bottom: 0.5em;
+  }
+}
+
+article {
+  @extend .container;
+}
+
+#demos {
+  margin: -1.5em auto 3em;
+}
+
+h1 {
+  font-size: 5em;
+  line-height: 1;
+  margin: 0.2em;
+
+}
+
+#logo {
+  height: 1.2em;
+  vertical-align: middle;
+}
+
+h3 {
+  font-size: 1.3em;
+  margin: 0.5em;
 }
 
 canvas {
   margin: auto;
 }
 
+p {
+  font-family: 'PT Mono', monospace;
+  font-size: 14px;
+  text-align: justify;
+  padding: 1em 2em 0;
+
+  em {
+    font-style: normal;
+    color: $link-color;
+  }
+}
+
 pre {
   text-align: left;
-  width: 43em;
   margin: auto;
-
 }
 
 .hljs {
   padding: 1.5em 2em;
   border-radius: 5px;
+  font-family: 'PT Mono', monospace;
+  font-size: 14px;
 }
 
 kbd {
@@ -33,24 +100,34 @@ ul {
   list-style-type: none;
   padding: 0;
 
-  li {
+  & > li {
     display: inline-block;
     font-size: 20px;
+
+    & > a {
+      border: 1px solid $link-color;
+      border-radius: 5px;
+      padding: 5px 10px;
+      transition: background 200ms ease, color 200ms ease;
+
+      &:hover {
+        text-decoration: none;
+        background-color: $link-color;
+        color: white;
+      }
+    }
   }
 
   li + li { margin-left: 1em; }
 }
 
 a {
+  display: inline-block;
+  font-family: 'PT Mono', monospace;
+  color: $link-color;
   text-decoration: none;
 
   &:hover { text-decoration: underline; }
-}
-
-.byline {
-  position: fixed;
-  bottom: 1em;
-  right: 1em;
 }
 
 .demo-header {
