@@ -69,6 +69,7 @@ canvas {
 p {
   font-family: 'PT Mono', monospace;
   font-size: 14px;
+  line-height: 1.3;
   text-align: justify;
   padding: 1em 2em 0;
 
@@ -119,7 +120,7 @@ ul {
     }
   }
 
-  li + li { margin-left: 1em; }
+  & > li { margin: 0.5em; }
 }
 
 a {
