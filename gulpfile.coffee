@@ -5,10 +5,11 @@ notify = require 'gulp-notify'
 browserSync = require 'browser-sync'
 
 sources =
-  sass  : 'demos/{,*}/*.scss'
-  html  : 'demos/{,*}/index.html'
+  img   : 'demos/{,*/}*.{svg,png}'
+  sass  : 'demos/{,*/}*.scss'
+  html  : 'demos/{,*/}index.html'
   src   : 'src/**/*.coffee'
-  demos : 'demos/{,*}/*.coffee'
+  demos : 'demos/{,*/}*.coffee'
   spec  : 'test/**/*.coffee'
 
 destination = 'dist/'
@@ -43,6 +44,8 @@ gulp.task 'test-web', ->
 
 gulp.task 'html', ->
   gulp.src sources.html
+      .pipe gulp.dest(destination)
+  gulp.src sources.img
       .pipe gulp.dest(destination)
   gulp.src 'test/web/index.html', base: 'test/web'
       .pipe gulp.dest(destination + '/test')
@@ -100,7 +103,7 @@ gulp.task 'watch', ['browserSync'], ->
   gulp.watch [sources.src, sources.spec], ['lint', 'test', 'src']
   gulp.watch sources.demos, ['demos']
   gulp.watch sources.sass, ['sass']
-  gulp.watch sources.html, ['html']
+  gulp.watch [sources.html, sources.img], ['html']
   # trigger reload when compiled files change
   gulp.watch 'dist/**', (file) ->
     browserSync.reload(file.path) if file.type is "changed"
