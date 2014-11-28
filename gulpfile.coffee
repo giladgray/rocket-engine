@@ -32,7 +32,6 @@ gulp.task 'test', ['test-web'], ->
         .on 'error', notify.onError('Mocha: <%= error.message %>')
 
 gulp.task 'test-web', ->
-  sass = require 'gulp-sass'
   source = require 'vinyl-source-stream'
   browserify = require 'browserify'
   browserify './test/web/index.coffee'
@@ -50,8 +49,10 @@ gulp.task 'html', ->
 
 gulp.task 'sass', ->
   sass = require 'gulp-sass'
+  autoprefixer = require 'gulp-autoprefixer'
   gulp.src sources.sass
       .pipe sass()
+      .pipe autoprefixer()
       .pipe gulp.dest(destination)
 
 gulp.task 'src', ->
