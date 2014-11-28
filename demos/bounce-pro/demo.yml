@@ -1,0 +1,7 @@
+title: Bounce! PRO
+tagline: a quantity of bouncing balls, forever at your mercy
+controls: |
+  <kbd>ENTER</kbd> to add 1 ball,
+  <kbd>SPACE</kbd> to destroy all <span class="count"></span> balls.
+script: bounce-pro.js
+srcPath: demos/bounce-pro/bounce-pro.coffee

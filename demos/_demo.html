@@ -1,0 +1,20 @@
+<html>
+  <head>
+    <title><%= contents.title %> - A Rocket Demo</title>
+    <meta name="viewport" content="width=device-width; initial-scale=1.0; maximum-scale=1.0;">
+    <link rel="stylesheet" href="../index.css" media="screen" charset="utf-8">
+  </head>
+  <body class="demo">
+    <div class="demo-header">
+      <a class="view-source" href="https://github.com/giladgray/rocket-engine/blob/master/<%= contents.srcPath %>">View Source</a>
+      <a class="title" href=".."><img src="../rocket_inverted.svg" alt="rocket" />rocket.js</a>
+      <div class="title">
+        <strong><%= contents.title %></strong> <%= contents.tagline %><br>
+        <%= contents.controls %>
+      </div>
+    </div>
+    <canvas id="canvas" width="300" height="300"></canvas>
+    <script src="../rocket.js" charset="utf-8"></script>
+    <script src="<%= contents.script %>" charset="utf-8"></script>
+  </body>
+</html>

@@ -1,0 +1,5 @@
+title: Mouseman
+tagline: Move the mouse, avoid the man!
+controls: <kbd>CLICK</kbd> to spend fuel to repulse the man.
+script: mouseman.js
+srcPath: demos/mouseman/mouseman.coffee

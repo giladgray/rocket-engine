@@ -1,0 +1,4 @@
+title: Bounce
+tagline: a lonely red ball bounces endlessly
+script: bounce.js
+srcPath: demos/bounce/bounce.coffee

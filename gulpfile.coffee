@@ -7,7 +7,8 @@ browserSync = require 'browser-sync'
 sources =
   img   : 'demos/{,*/}*.{svg,png}'
   sass  : 'demos/{,*/}*.scss'
-  html  : 'demos/{,*/}index.html'
+  html  : 'demos/index.html'
+  yml   : 'demos/{,*/}demo.yml'
   src   : 'src/**/*.coffee'
   demos : 'demos/{,*/}*.coffee'
   spec  : 'test/**/*.coffee'
@@ -43,9 +44,15 @@ gulp.task 'test-web', ->
     .pipe gulp.dest destination + '/test'
 
 gulp.task 'html', ->
-  gulp.src sources.html
+  wrap = require 'gulp-wrap'
+  rename = require 'gulp-rename'
+  gulp.src sources.yml
+      .pipe wrap(src: 'demos/_demo.html')
+      .pipe rename(basename: 'index', extname: '.html')
       .pipe gulp.dest(destination)
-  gulp.src sources.img
+
+gulp.task 'copy', ->
+  gulp.src [sources.html, sources.img]
       .pipe gulp.dest(destination)
   gulp.src 'test/web/index.html', base: 'test/web'
       .pipe gulp.dest(destination + '/test')
@@ -80,7 +87,7 @@ gulp.task 'demos', ->
       .pipe gulp.dest(destination)
 
 # Compile all sources!
-gulp.task 'build', ['html', 'sass', 'src', 'demos']
+gulp.task 'build', ['copy', 'html', 'sass', 'src', 'demos']
 
 # Reloads the page for us, but first builds all the sources
 gulp.task 'browserSync', ['build'], ->
@@ -103,7 +110,8 @@ gulp.task 'watch', ['browserSync'], ->
   gulp.watch [sources.src, sources.spec], ['lint', 'test', 'src']
   gulp.watch sources.demos, ['demos']
   gulp.watch sources.sass, ['sass']
-  gulp.watch [sources.html, sources.img], ['html']
+  gulp.watch [sources.yml, 'demos/_demo.html'], ['html']
+  gulp.watch [sources.html, sources.img], ['copy']
   # trigger reload when compiled files change
   gulp.watch 'dist/**', (file) ->
     browserSync.reload(file.path) if file.type is "changed"

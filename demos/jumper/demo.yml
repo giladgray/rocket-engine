@@ -1,0 +1,5 @@
+title: Jumper
+tagline: almost a real game but mostly a hack
+controls: <kbd>LEFT</kbd> or <kbd>RIGHT</kbd> to jump. Don't touch anything!
+script: jumper.js
+srcPath: demos/jumper/jumper.coffee
